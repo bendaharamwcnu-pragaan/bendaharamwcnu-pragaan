@@ -1,68 +1,141 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Accounting MWCNU PRAGAAN</title>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<style>body{font-family:'Poppins',sans-serif}</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounting MWCNU PRAGAAN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>body{font-family:'Poppins',sans-serif}</style>
 </head>
 <body class="bg-gray-50 p-4">
-<div class="max-w-md mx-auto">
-<div class="flex justify-between items-center mb-6">
-<div class="flex items-center gap-3">
-<img src="https://nu.or.id/assets/img/logo-nu.png" class="w-12 h-12">
-<div><h1 class="text-xl font-bold text-green-800">MWCNU PRAGAAN</h1><p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p></div>
-</div>
-<button onclick="logout()" id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold hidden">Logout</button>
-<button onclick="showLogin()" id="loginBtn" class="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold">Login</button>
-</div>
-<div id="loginForm" class="bg-white rounded-2xl p-4 mb-4 shadow-sm hidden">
-<h3 class="font-bold text-green-800 mb-3">Login Bendahara</h3>
-<input type="email" id="email" placeholder="Email" class="w-full border rounded-lg p-3 mb-2">
-<input type="password" id="password" placeholder="Password" class="w-full border rounded-lg p-3 mb-3">
-<button onclick="login()" class="w-full bg-green-700 text-white p-3 rounded-lg font-semibold">Masuk</button>
-</div>
-<div id="mainApp" class="hidden">
-<div class="bg-white rounded-2xl p-4 mb-4 shadow-sm">
-<div class="text-center text-green-800 font-semibold mb-3">Filter Tahun Buku</div>
-<select id="tahunFilter" onchange="loadData()" class="w-full border rounded-lg p-3 text-center font-medium"><option>2026</option><option>2025</option><option>2024</option></select>
-</div>
-<div class="space-y-3 mb-4">
-<div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl p-5 shadow"><p class="text-sm opacity-90">Total Arus Masuk</p><p class="text-3xl font-bold" id="arusMasuk">Rp 0</p></div>
-<div class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl p-5 shadow"><p class="text-sm opacity-90">Total Arus Keluar</p><p class="text-3xl font-bold" id="arusKeluar">Rp 0</p></div>
-<div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-2xl p-5 shadow"><p class="text-sm opacity-90">Saldo Bersih</p><p class="text-3xl font-bold" id="saldoBersih">Rp 0</p></div>
-</div>
-<div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-<h2 class="text-green-800 font-bold mb-3">Input Transaksi</h2>
-<input type="date" id="tanggal" class="w-full border rounded-lg p-3 mb-2">
-<select id="rekening" class="w-full border rounded-lg p-3 mb-2"><option value="BSI">Bank Syariah Indonesia</option><option value="BMT">BMT NUansaumat</option></select>
-<input type="text" id="keterangan" placeholder="Keterangan" class="w-full border rounded-lg p-3 mb-2">
-<input type="number" id="masuk" placeholder="Pemasukan Rp" class="w-full border rounded-lg p-3 mb-2">
-<input type="number" id="keluar" placeholder="Pengeluaran Rp" class="w-full border rounded-lg p-3 mb-3">
-<button onclick="simpan()" class="w-full bg-green-700 text-white p-3 rounded-lg font-semibold">Simpan Data</button>
-</div>
-<div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-<h2 class="text-green-800 font-bold mb-3">Rincian Saldo Kas</h2>
-<div class="space-y-3">
-<div class="border border-green-200 rounded-xl p-4 bg-green-50"><p class="font-semibold text-green-800">Bank Syariah Indonesia / BSI</p><p class="text-2xl font-bold text-green-700" id="saldoBSI">Rp 0</p></div>
-<div class="border border-blue-200 rounded-xl p-4 bg-blue-50"><p class="font-semibold text-blue-800">BMT NUansaumat</p><p class="text-2xl font-bold text-blue-700" id="saldoBMT">Rp 0</p></div>
-</div>
-</div>
-</div>
-</div>
+  <div class="max-w-md mx-auto">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center gap-3">
+        <img src="https://nu.or.id/assets/img/logo-nu.png" alt="Logo NU" class="w-12 h-12">
+        <div>
+          <h1 class="text-xl font-bold text-green-800">MWCNU PRAGAAN</h1>
+          <p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p>
+        </div>
+      </div>
+      <button onclick="logout()" id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold hidden">Logout</button>
+      <button onclick="showLogin()" id="loginBtn" class="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold">Login</button>
+    </div>
+
+    <!-- Form Login -->
+    <div id="loginForm" class="bg-white rounded-2xl p-4 mb-4 shadow-sm hidden">
+      <h3 class="font-bold text-green-800 mb-3">Login Bendahara</h3>
+      <input type="email" id="email" placeholder="Email" class="w-full border rounded-lg p-3 mb-2">
+      <input type="password" id="password" placeholder="Password" class="w-full border rounded-lg p-3 mb-3">
+      <button onclick="login()" class="w-full bg-green-700 text-white p-3 rounded-lg font-semibold">Masuk</button>
+    </div>
+
+    <!-- Konten Utama -->
+    <div id="mainApp" class="hidden">
+      <!-- Filter -->
+      <div class="bg-white rounded-2xl p-4 mb-4 shadow-sm">
+        <div class="text-center text-green-800 font-semibold mb-3">Filter Tahun Buku</div>
+        <select id="tahunFilter" onchange="loadData()" class="w-full border rounded-lg p-3 text-center font-medium">
+          <option value="2026">2026</option>
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+        </select>
+      </div>
+
+      <!-- Ringkasan -->
+      <div class="space-y-3 mb-4">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl p-5 shadow">
+          <p class="text-sm opacity-90">Total Arus Masuk</p>
+          <p class="text-3xl font-bold" id="arusMasuk">Rp 0</p>
+        </div>
+        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl p-5 shadow">
+          <p class="text-sm opacity-90">Total Arus Keluar</p>
+          <p class="text-3xl font-bold" id="arusKeluar">Rp 0</p>
+        </div>
+        <div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-2xl p-5 shadow">
+          <p class="text-sm opacity-90">Saldo Bersih</p>
+          <p class="text-3xl font-bold" id="saldoBersih">Rp 0</p>
+        </div>
+      </div>
+
+      <!-- Form Input -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <h2 class="text-green-800 font-bold mb-3">Input Transaksi</h2>
+        <input type="date" id="tanggal" class="w-full border rounded-lg p-3 mb-2">
+        <select id="rekening" class="w-full border rounded-lg p-3 mb-2">
+          <option value="BSI">Bank Syariah Indonesia</option>
+          <option value="BMT">BMT NUansaumat</option>
+        </select>
+        <input type="text" id="keterangan" placeholder="Keterangan" class="w-full border rounded-lg p-3 mb-2">
+        <input type="number" id="masuk" placeholder="Pemasukan Rp" class="w-full border rounded-lg p-3 mb-2">
+        <input type="number" id="keluar" placeholder="Pengeluaran Rp" class="w-full border rounded-lg p-3 mb-3">
+        <button onclick="simpan()" class="w-full bg-green-700 text-white p-3 rounded-lg font-semibold">Simpan Data</button>
+      </div>
+
+      <!-- Rincian Kas -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <h2 class="text-green-800 font-bold mb-3">Rincian Saldo Kas</h2>
+        <div class="space-y-3">
+          <div class="border border-green-200 rounded-xl p-4 bg-green-50">
+            <p class="font-semibold text-green-800">Bank Syariah Indonesia / BSI</p>
+            <p class="text-2xl font-bold text-green-700" id="saldoBSI">Rp 0</p>
+          </div>
+          <div class="border border-blue-200 rounded-xl p-4 bg-blue-50">
+            <p class="font-semibold text-blue-800">BMT NUansaumat</p>
+            <p class="text-2xl font-bold text-blue-700" id="saldoBMT">Rp 0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
-const SUPABASE_URL = 'https://bvehkinicqzjubmbxbky.supabase.co'
-const SUPABASE_KEY = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38Nbu'
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-function showLogin(){document.getElementById('loginForm').classList.remove('hidden')}
-async function login(){const email=document.getElementById('email').value;const password=document.getElementById('password').value;const {error}=await supabase.auth.signInWithPassword({email,password});if(error)alert('Login gagal: '+error.message);else{document.getElementById('loginForm').classList.add('hidden');document.getElementById('loginBtn').classList.add('hidden');document.getElementById('logoutBtn').classList.remove('hidden');document.getElementById('mainApp').classList.remove('hidden');loadData();}}
-async function logout(){await supabase.auth.signOut();location.reload();}
-async function simpan(){const {error}=await supabase.from('keuangan').insert([{tanggal:document.getElementById('tanggal').value,tahun:parseInt(document.getElementById('tahunFilter').value),rekening:document.getElementById('rekening').value,keterangan:document.getElementById('keterangan').value,masuk:parseFloat(document.getElementById('masuk').value)||0,keluar:parseFloat(document.getElementById('keluar').value)||0}]);if(error)alert('Gagal: '+error.message);else{alert('Tersimpan');loadData();}}
-async function loadData(){const tahun=document.getElementById('tahunFilter').value;const {data}=await supabase.from('keuangan').select('*').eq('tahun',tahun);let m=0,k=0,b=0,mt=0;if(data)data.forEach(r=>{m+=r.masuk;k+=r.keluar;if(r.rekening=='BSI')b+=r.masuk-r.keluar;if(r.rekening=='BMT')mt+=r.masuk-r.keluar;});document.getElementById('arusMasuk').innerText='Rp '+m.toLocaleString('id-ID');document.getElementById('arusKeluar').innerText='Rp '+k.toLocaleString('id-ID');document.getElementById('saldoBersih').innerText='Rp '+(m-k).toLocaleString('id-ID');document.getElementById('saldoBSI').innerText='Rp '+b.toLocaleString('id-ID');document.getElementById('saldoBMT').innerText='Rp '+mt.toLocaleString('id-ID');}
-supabase.auth.getSession().then(({data:{session}})=>{if(session){document.getElementById('loginBtn').classList.add('hidden');document.getElementById('logoutBtn').classList.remove('hidden');document.getElementById('mainApp').classList.remove('hidden');loadData();}})
+  const SUPABASE_URL = 'https://bvehkinicqzjubmbxbky.supabase.co'
+  const SUPABASE_KEY = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38Nbu'
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  function showLogin(){ document.getElementById('loginForm').classList.remove('hidden') }
+  async function login(){
+    const { error } = await supabase.auth.signInWithPassword({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+    if(error) alert('Login gagal: ' + error.message)
+    else { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('loginBtn').classList.add('hidden'); document.getElementById('logoutBtn').classList.remove('hidden'); document.getElementById('mainApp').classList.remove('hidden'); loadData(); }
+  }
+  async function logout(){ await supabase.auth.signOut(); location.reload(); }
+  
+  async function simpan(){
+    const tahun = document.getElementById('tahunFilter').value;
+    const { error } = await supabase.from('keuangan').insert([{
+      tanggal: document.getElementById('tanggal').value, tahun: parseInt(tahun), rekening: document.getElementById('rekening').value, keterangan: document.getElementById('keterangan').value,
+      masuk: parseFloat(document.getElementById('masuk').value) || 0, keluar: parseFloat(document.getElementById('keluar').value) || 0
+    }])
+    if(error) alert('Gagal: ' + error.message) 
+    else { alert('Tersimpan'); loadData(); }
+  }
+
+  async function loadData(){
+    const tahun = document.getElementById('tahunFilter').value;
+    const { data } = await supabase.from('keuangan').select('*').eq('tahun', tahun)
+    
+    let totalM = 0, totalK = 0, saldoBSI = 0, saldoBMT = 0;
+    data.forEach(r => {
+      totalM += r.masuk; totalK += r.keluar;
+      if(r.rekening == 'BSI') saldoBSI += r.masuk - r.keluar;
+      if(r.rekening == 'BMT') saldoBMT += r.masuk - r.keluar;
+    })
+    
+    document.getElementById('arusMasuk').innerText = 'Rp ' + totalM.toLocaleString('id-ID');
+    document.getElementById('arusKeluar').innerText = 'Rp ' + totalK.toLocaleString('id-ID');
+    document.getElementById('saldoBersih').innerText = 'Rp ' + (totalM - totalK).toLocaleString('id-ID');
+    document.getElementById('saldoBSI').innerText = 'Rp ' + saldoBSI.toLocaleString('id-ID');
+    document.getElementById('saldoBMT').innerText = 'Rp ' + saldoBMT.toLocaleString('id-ID');
+  }
+
+  supabase.auth.getSession().then(({ data: { session }}) => {
+    if(session){ document.getElementById('loginBtn').classList.add('hidden'); document.getElementById('logoutBtn').classList.remove('hidden'); document.getElementById('mainApp').classList.remove('hidden'); loadData(); }
+  })
 </script>
 </body>
 </html>
