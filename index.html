@@ -2,154 +2,85 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Accounting MWCNU PRAGAAN</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>body{font-family:'Poppins',sans-serif}</style>
+  <title>Keuangan MWCNU</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; }
+    button { background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
+    button:hover { background: #218838; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #f2f2f2; }
+    .masuk { color: green; font-weight: bold; } .keluar { color: red; font-weight: bold; }
+    #logoutBtn { background: #dc3545; }
+  </style>
 </head>
-<body class="bg-gray-50 p-4">
-  <div class="max-w-md mx-auto">
+<body>
+<div class="container">
+  <h2>📒 Bendahara MWCNU</h2>
 
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <div class="flex items-center gap-3">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Lambang_NU.png" alt="Logo NU" class="w-12 h-12">
-        <div>
-          <h1 class="text-xl font-bold text-green-800">MWCNU PRAGAAN</h1>
-          <p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p>
-        </div>
-      </div>
-      <button class="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold">?? Login</button>
-    </div>
-
-    <!-- Filter Tahun -->
-    <div class="bg-white rounded-2xl p-4 mb-4 shadow-sm">
-      <div class="flex items-center justify-center gap-2 text-green-800 font-semibold mb-3">?? Filter Tahun Buku</div>
-      <select id="tahunFilter" class="w-full border rounded-lg p-3 text-center font-medium">
-        <option value="2026">2026</option>
-        <option value="2025">2025</option>
-        <option value="2024">2024</option>
-      </select>
-    </div>
-
-    <!-- Ringkasan Total -->
-    <div class="space-y-3 mb-4">
-      <div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl p-5 shadow">
-        <p class="text-sm opacity-90">Total Arus Masuk</p>
-        <p class="text-3xl font-bold" id="arusMasuk">Rp 0</p>
-      </div>
-      <div class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl p-5 shadow">
-        <p class="text-sm opacity-90">Total Arus Keluar</p>
-        <p class="text-3xl font-bold" id="arusKeluar">Rp 0</p>
-      </div>
-      <div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-2xl p-5 shadow">
-        <p class="text-sm opacity-90">Saldo Bersih</p>
-        <p class="text-3xl font-bold" id="saldoBersih">Rp 0</p>
-      </div>
-    </div>
-
-    <!-- Rincian Kas 2 Rekening -->
-    <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-      <h2 class="text-green-800 font-bold mb-3">?? Rincian Saldo Kas</h2>
-      <div class="space-y-3">
-        <!-- BNI -->
-        <div class="border border-orange-200 rounded-xl p-4 bg-orange-50">
-          <div class="flex justify-between items-center mb-1">
-            <p class="font-semibold text-orange-800">Bank BNI</p>
-            <span class="text-xs bg-orange-600 text-white px-2 py-1 rounded">Rek 1</span>
-          </div>
-          <p class="text-xs text-gray-500 mb-2">No. Rek: 1921854722</p>
-          <p class="text-2xl font-bold text-orange-700" id="saldoBNI">Rp 0</p>
-        </div>
-        <!-- BMT NUansaumat -->
-        <div class="border border-blue-200 rounded-xl p-4 bg-blue-50">
-          <div class="flex justify-between items-center mb-1">
-            <p class="font-semibold text-blue-800">BMT NUansaumat</p>
-            <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Rek 2</span>
-          </div>
-          <p class="text-xs text-gray-500 mb-2">No. Rek: 01-120101000309</p>
-          <p class="text-2xl font-bold text-blue-700" id="saldoBMT">Rp 0</p>
-        </div>
-        <!-- Total Gabungan -->
-        <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
-          <p class="text-sm text-gray-600 mb-1">Total Kas 2 Rekening</p>
-          <p class="text-2xl font-bold text-gray-800" id="totalKas">Rp 0</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Grafik -->
-    <div class="bg-white rounded-2xl p-4 shadow-sm">
-      <h2 class="text-green-800 font-bold mb-3">?? Arus Kas</h2>
-      <canvas id="grafikKas"></canvas>
-      <div class="flex justify-center gap-6 mt-4 text-sm">
-        <div class="flex items-center gap-2"><div class="w-4 h-4 bg-green-600 rounded"></div> Debit</div>
-        <div class="flex items-center gap-2"><div class="w-4 h-4 bg-red-500 rounded"></div> Kredit</div>
-      </div>
-    </div>
-
-    <p class="text-center text-xs text-gray-400 mt-6">� 2026 MWCNU Pragaan</p>
+  <div id="login">
+    <h3>Login</h3>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
   </div>
 
-  <script>
-    // GANTI ANGKA INI SESUAI SALDO & MUTASI REAL MWCNU PRAGAAN
-    const dataTahun = {
-      2026: {
-        masuk: 8750000,
-        keluar: 8120000,
-        bni: 4200000, // Saldo BNI 1921854722
-        bmt: 2100000 // Saldo BMT NUansaumat 01-120101000309
-      },
-      2025: {
-        masuk: 12450000,
-        keluar: 11800000,
-        bni: 5800000,
-        bmt: 3200000
-      },
-      2024: {
-        masuk: 9800000,
-        keluar: 9300000,
-        bni: 3500000,
-        bmt: 1500000
-      }
-    };
+  <div id="app" style="display:none;">
+    <h3>Input Data Keuangan</h3>
+    <input type="date" id="tanggal">
+    <input type="text" id="keterangan" placeholder="Keterangan: Misal Iuran Warga">
+    <input type="number" id="masuk" placeholder="Pemasukan Rp">
+    <input type="number" id="keluar" placeholder="Pengeluaran Rp">
+    <button onclick="simpan()">💾 Simpan Data</button>
+    <button id="logoutBtn" onclick="logout()">Logout</button>
+    
+    <h3>Riwayat Transaksi</h3>
+    <table id="tabel"></table>
+  </div>
+</div>
 
-    const ctx = document.getElementById('grafikKas');
-    let chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['2026'],
-        datasets: [
-          { label: 'Debit', data: [8750000], backgroundColor: '#15803d', borderRadius: 8 },
-          { label: 'Kredit', data: [8120000], backgroundColor: '#dc2626', borderRadius: 8 }
-        ]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { callback: val => 'Rp ' + val.toLocaleString('id-ID') }
-          }
-        },
-        plugins: { legend: { display: false } }
-      }
-    });
+<script>
+  const SUPABASE_URL = 'https://bvehkinicqzjubmbxbky.supabase.co'
+  const SUPABASE_KEY = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38Nbu'
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-    function formatRupiah(angka) {
-      return 'Rp ' + angka.toLocaleString('id-ID');
-    }
+  async function login() {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value
+    })
+    if(error) alert('Login gagal: ' + error.message)
+    else { document.getElementById('login').style.display='none'; document.getElementById('app').style.display='block'; loadData(); }
+  }
 
-    function updateDashboard(tahun) {
-      const d = dataTahun[tahun];
-      const saldo = d.masuk - d.keluar;
-      const totalKas = d.bni + d.bmt;
+  async function logout() { await supabase.auth.signOut(); location.reload(); }
 
-      document.getElementById('arusMasuk').textContent = formatRupiah(d.masuk);
-      document.getElementById('arusKeluar').textContent = formatRupiah(d.keluar);
-      document.getElementById('saldoBersih').textContent = formatRupiah(saldo);
-      document.getElementById('saldoBNI').textContent = formatRupiah(d.bni);
-      document.getElementById('saldoBMT').textContent = formatRupiah(d.bmt);
-      document.getElementById('
+  async function simpan() {
+    const { error } = await supabase.from('keuangan').insert([{
+      tanggal: document.getElementById('tanggal').value,
+      keterangan: document.getElementById('keterangan').value,
+      masuk: parseFloat(document.getElementById('masuk').value) || 0,
+      keluar: parseFloat(document.getElementById('keluar').value) || 0
+    }])
+    if(error) alert('Gagal simpan: ' + error.message)
+    else { alert('Data tersimpan!'); loadData(); }
+  }
+
+  async function loadData() {
+    const { data } = await supabase.from('keuangan').select('*').order('tanggal', { ascending: false })
+    let html = '<tr><th>Tanggal</th><th>Keterangan</th><th>Masuk</th><th>Keluar</th></tr>';
+    data.forEach(r => {
+      html += <tr><td>${r.tanggal}</td><td>${r.keterangan}</td><td class="masuk">Rp ${r.masuk.toLocaleString('id-ID')}</td><td class="keluar">Rp ${r.keluar.toLocaleString('id-ID')}</td></tr>
+    })
+    document.getElementById('tabel').innerHTML = html;
+  }
+
+  supabase.auth.getSession().then(({ data: { session }}) => {
+    if(session){ document.getElementById('login').style.display='none'; document.getElementById('app').style.display='block'; loadData(); }
+  })
+</script>
+</body>
+</html>
