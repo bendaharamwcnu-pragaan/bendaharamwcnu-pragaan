@@ -90,7 +90,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://bvehkinicqzjumbbxbky.supabase.co'
-  const SUPABASE_KEY = 'isi_key_lama_sampean'
+  const SUPABASE_KEY = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38'
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
   function formatRup(angka) {
@@ -98,7 +98,12 @@
   }
 
   async function loadData() {
-    let { data, error } = await supabase.from('transaksi').select('*')
+    // 1. Ambil data tahun 2026 saja
+    let { data, error } = await supabase.from('transaksi')
+     .select('*')
+     .gte('tanggal', '2026-01-01')
+     .lte('tanggal', '2026-12-31')
+      
     if(error){ console.log('ERROR:', error); return }
     
     let saldoBNI = 0, saldoBMT = 0, totalMasuk = 0, totalKeluar = 0
@@ -116,14 +121,21 @@
       }
     })
 
-// Tampilkan ke website - versi baru
-  document.querySelectorAll('.text-3xl')[0].innerText = formatRup(totalMasuk) // Pemasukan
-  document.querySelectorAll('.text-3xl')[1].innerText = formatRup(totalKeluar) // Pengeluaran
-  document.querySelectorAll('.text-3xl')[2].innerText = formatRup(totalMasuk - totalKeluar) // Saldo Bersih
-  document.querySelectorAll('.text-2xl')[0].innerText = formatRup(saldoBNI) // BNI
-  document.querySelectorAll('.text-2xl')[1].innerText = formatRup(saldoBMT) // BMT
-  document.querySelectorAll('.text-2xl')[2].innerText = formatRup(saldoBNI + saldoBMT) // Total
-}
-loadData()
+    // 2. Target berdasarkan urutan di website
+    const angka3xl = document.querySelectorAll('.text-3xl')
+    const angka2xl = document.querySelectorAll('.text-2xl')
+    
+    if(angka3xl.length >= 3){
+      angka3xl[0].innerText = formatRup(totalMasuk) // Total Arus Masuk
+      angka3xl[1].innerText = formatRup(totalKeluar) // Total Arus Keluar 
+      angka3xl[2].innerText = formatRup(totalMasuk - totalKeluar) // Saldo Bersih
+    }
+    
+    if(angka2xl.length >= 3){
+      angka2xl[0].innerText = formatRup(saldoBNI) // Bank BNI
+      angka2xl[1].innerText = formatRup(saldoBMT) // BMT
+      angka2xl[2].innerText = formatRup(saldoBNI + saldoBMT) // Total Kas
+    }
+  }
+  loadData()
 </script>
-
