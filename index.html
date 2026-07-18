@@ -89,49 +89,40 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const supabaseUrl = 'https://bvehkinicqjubmbxbky.supabase.co'
-  const supabaseKey = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38Nb1'
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+  const SUPABASE_URL = 'https://bvehkinicqzjumbbxbky.supabase.co'
+  const SUPABASE_KEY = 'isi_key_lama_sampean'
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
   function formatRup(angka) {
-      return new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR'}).format(angka)
-    }
-async function loadData() {
-  // Ambil semua data dari tabel transaksi
-  const { data, error } = await supabase
-    .from('transaksi')  // <-- ini nama tabelnya
-    .select('*')
-
-  if (error) {
-    console.log('Error:', error)
-    return
+    return new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR', minimumFractionDigits: 0}).format(angka)
   }
 
-  // Hitung saldo BNI dan BMT
-  let saldoBNI = 0
-  let saldoBMT = 0
+  async function loadData() {
+    let { data, error } = await supabase.from('transaksi').select('*')
+    if(error){ console.log('ERROR:', error); return }
+    
+    let saldoBNI = 0, saldoBMT = 0, totalMasuk = 0, totalKeluar = 0
 
-  data.forEach(trx => {
-    if (trx.jenis === 'masuk') {
-      if (trx.rekening === 'BNI') saldoBNI += trx.jumlah
-      if (trx.rekening === 'BMT') saldoBMT += trx.jumlah
-    }
-    if (trx.jenis === 'keluar') {
-      if (trx.rekening === 'BNI') saldoBNI -= trx.jumlah
-      if (trx.rekening === 'BMT') saldoBMT -= trx.jumlah
-    }
-  })
+    data.forEach(trx => {
+      if (trx.jenis === 'masuk') {
+        totalMasuk += trx.jumlah
+        if (trx.rekening === 'BNI') saldoBNI += trx.jumlah
+        if (trx.rekening === 'BMT') saldoBMT += trx.jumlah
+      }
+      if (trx.jenis === 'keluar') {
+        totalKeluar += trx.jumlah
+        if (trx.rekening === 'BNI') saldoBNI -= trx.jumlah
+        if (trx.rekening === 'BMT') saldoBMT -= trx.jumlah
+      }
+    })
 
-// Tampilkan ke website
-  let elBNI = document.querySelectorAll('.text-red-600')[1]
-  let elBMT = document.querySelectorAll('.text-blue-600')[0]
-  let elTotal = document.querySelector('.text-orange-500')
-
-  if(elBNI) elBNI.innerText = formatRup(saldoBNI)
-  if(elBMT) elBMT.innerText = formatRup(saldoBMT)
-  if(elTotal) elTotal.innerText = formatRup(saldoBNI + saldoBMT)
-}
-
-// Jalankan pas web dibuka
-loadData()
-  </script>
+    // Tampilkan ke website
+    document.querySelector('.bg-green-500 .text-3xl').innerText = formatRup(totalMasuk)
+    document.querySelector('.bg-red-500 .text-3xl').innerText = formatRup(totalKeluar)
+    document.querySelector('.bg-yellow-500 .text-3xl').innerText = formatRup(totalMasuk - totalKeluar)
+    document.querySelector('.bg-orange-100 .text-2xl').innerText = formatRup(saldoBNI)
+    document.querySelector('.bg-blue-100 .text-2xl').innerText = formatRup(saldoBMT)
+    document.querySelector('.border-dashed .text-2xl').innerText = formatRup(saldoBNI + saldoBMT)
+  }
+  loadData()
+</script>
