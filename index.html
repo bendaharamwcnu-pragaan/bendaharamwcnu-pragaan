@@ -93,9 +93,9 @@
   </div>
 
 <script>
-  const SUPABASE_URL = 'https://bvehkinicqzjubmbxbky.supabase.co'
-  const SUPABASE_KEY = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38Nbu'
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
   function showLogin(){ document.getElementById('loginForm').classList.remove('hidden') }
   async function login(){
