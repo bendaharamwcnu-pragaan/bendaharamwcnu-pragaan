@@ -87,71 +87,24 @@
 
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = 'https://bvehkinicqzjumbbxbky.supabase.co'
-  const SUPABASE_KEY = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38'
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+const SUPABASE_URL = 'https://bvehkinicqzjumbbxbky.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38'
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-  function formatRup(angka) {
-    return new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR', minimumFractionDigits: 0}).format(angka)
-  }
+async function loadData() {
+  let { data, error } = await supabase.from('transaksi').select('*')
+  console.log("HASIL DARI SUPABASE:", data) // ini buat cek
+  if(error){ console.log('ERROR:', error); return }
 
-  async function loadData() {
-  // 1. Ambil semua data dulu
-let { data, error } = await supabase.from('transaksi').select('*')
+  let totalMasuk = 0
+  data.forEach(trx => {
+    if (trx.jenis === 'masuk') totalMasuk += trx.jumlah
+  })
 
-if(error){ console.log('ERROR:', error); return }
-
-let saldoBNI = 0, saldoBMT = 0, totalMasuk = 0, totalKeluar = 0
-
-data.filter(trx => trx.tanggal && trx.tanggal.startsWith('2026')).forEach(trx => {
-    if (trx.jenis === 'masuk') {
-        totalMasuk += trx.jumlah
-        if (trx.rekening === 'BNI') saldoBNI += trx.jumlah
-        if (trx.rekening === 'BMT') saldoBMT += trx.jumlah
-    }
-    if (trx.jenis === 'keluar') {
-        totalKeluar += trx.jumlah // <-- ini K besar
-        if (trx.rekening === 'BNI') saldoBNI -= trx.jumlah
-        if (trx.rekening === 'BMT') saldoBMT -= trx.jumlah
-    }
-})  // 1. Ambil data tahun 2026 saja
-    let { data, error } = await supabase.from('transaksi')
-     .select('*')
-      
-    if(error){ console.log('ERROR:', error); return }
-    
-    let saldoBNI = 0, saldoBMT = 0, totalMasuk = 0, totalKeluar = 0
-
-    data.forEach(trx => {
-      if (trx.jenis === 'masuk') {
-        totalMasuk += trx.jumlah
-        if (trx.rekening === 'BNI') saldoBNI += trx.jumlah
-        if (trx.rekening === 'BMT') saldoBMT += trx.jumlah
-      }
-      if (trx.jenis === 'keluar') {
-        totalKeluar += trx.jumlah
-        if (trx.rekening === 'BNI') saldoBNI -= trx.jumlah
-        if (trx.rekening === 'BMT') saldoBMT -= trx.jumlah
-      }
-    })
-
-    // 2. Target berdasarkan urutan di website
-    const angka3xl = document.querySelectorAll('.text-3xl')
-    const angka2xl = document.querySelectorAll('.text-2xl')
-    
-    if(angka3xl.length >= 3){
-      angka3xl[0].innerText = formatRup(totalMasuk) // Total Arus Masuk
-      angka3xl[1].innerText = formatRup(totalKeluar) // Total Arus Keluar 
-      angka3xl[2].innerText = formatRup(totalMasuk - totalKeluar) // Saldo Bersih
-    }
-    
-    if(angka2xl.length >= 3){
-      angka2xl[0].innerText = formatRup(saldoBNI) // Bank BNI
-      angka2xl[1].innerText = formatRup(saldoBMT) // BMT
-      angka2xl[2].innerText = formatRup(saldoBNI + saldoBMT) // Total Kas
-    }
-  }
-  loadData()
+  // Langsung ganti box pertama aja buat ngetes
+  document.querySelector('.text-3xl').innerText = 'Rp ' + totalMasuk.toLocaleString('id-ID')
+}
+loadData()
 </script>
