@@ -122,10 +122,10 @@ async function loadData() {
     }
   })
 
-  // Tampilkan ke website
-  document.getElementById('totalBNI').innerText = formatRup(saldoBNI)
-  document.getElementById('totalBMT').innerText = formatRup(saldoBMT)
-  document.getElementById('totalGabungan').innerText = formatRup(saldoBNI + saldoBMT)
+// Tampilkan ke website - pakai class dari foto
+  document.querySelectorAll('.text-red-600')[1].innerText = formatRup(saldoBNI) // BNI
+  document.querySelectorAll('.text-blue-600')[0].innerText = formatRup(saldoBMT) // BMT
+  document.querySelector('.text-orange-500').innerText = formatRup(saldoBNI + saldoBMT) // Total
 }
 
 // Jalankan pas web dibuka
