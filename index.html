@@ -98,11 +98,27 @@
   }
 
   async function loadData() {
-    // 1. Ambil data tahun 2026 saja
+  // 1. Ambil semua data dulu
+let { data, error } = await supabase.from('transaksi').select('*')
+
+if(error){ console.log('ERROR:', error); return }
+
+let saldoBNI = 0, saldoBMT = 0, totalMasuk = 0, totalKeluar = 0
+
+data.filter(trx => trx.tanggal && trx.tanggal.startsWith('2026')).forEach(trx => {
+    if (trx.jenis === 'masuk') {
+        totalMasuk += trx.jumlah
+        if (trx.rekening === 'BNI') saldoBNI += trx.jumlah
+        if (trx.rekening === 'BMT') saldoBMT += trx.jumlah
+    }
+    if (trx.jenis === 'keluar') {
+        totalKeluar += trx.jumlah // <-- ini K besar
+        if (trx.rekening === 'BNI') saldoBNI -= trx.jumlah
+        if (trx.rekening === 'BMT') saldoBMT -= trx.jumlah
+    }
+})  // 1. Ambil data tahun 2026 saja
     let { data, error } = await supabase.from('transaksi')
      .select('*')
-     .gte('tanggal', '2026-01-01')
-     .lte('tanggal', '2026-12-31')
       
     if(error){ console.log('ERROR:', error); return }
     
