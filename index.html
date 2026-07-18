@@ -116,13 +116,13 @@
       }
     })
 
-// Tampilkan ke website
-  document.querySelector('.bg-green-500 .text-3xl').innerText = formatRup(totalMasuk)
-  document.querySelector('.bg-red-500 .text-3xl').innerText = formatRup(totalKeluar)
-  document.querySelector('.bg-yellow-500 .text-3xl').innerText = formatRup(totalMasuk - totalKeluar)
-  document.querySelector('.bg-orange-100 .text-2xl').innerText = formatRup(saldoBNI)
-  document.querySelector('.bg-blue-100 .text-2xl').innerText = formatRup(saldoBMT)
-  document.querySelector('.border-dashed .text-2xl').innerText = formatRup(saldoBNI + saldoBMT)
+// Tampilkan ke website - versi baru
+  document.querySelectorAll('.text-3xl')[0].innerText = formatRup(totalMasuk) // Pemasukan
+  document.querySelectorAll('.text-3xl')[1].innerText = formatRup(totalKeluar) // Pengeluaran
+  document.querySelectorAll('.text-3xl')[2].innerText = formatRup(totalMasuk - totalKeluar) // Saldo Bersih
+  document.querySelectorAll('.text-2xl')[0].innerText = formatRup(saldoBNI) // BNI
+  document.querySelectorAll('.text-2xl')[1].innerText = formatRup(saldoBMT) // BMT
+  document.querySelectorAll('.text-2xl')[2].innerText = formatRup(saldoBNI + saldoBMT) // Total
 }
 loadData()
 </script>
