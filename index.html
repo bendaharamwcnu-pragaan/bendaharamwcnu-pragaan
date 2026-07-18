@@ -122,10 +122,14 @@ async function loadData() {
     }
   })
 
-// Tampilkan ke website - pakai class dari foto
-  document.querySelectorAll('.text-red-600')[1].innerText = formatRup(saldoBNI) // BNI
-  document.querySelectorAll('.text-blue-600')[0].innerText = formatRup(saldoBMT) // BMT
-  document.querySelector('.text-orange-500').innerText = formatRup(saldoBNI + saldoBMT) // Total
+// Tampilkan ke website
+  let elBNI = document.querySelectorAll('.text-red-600')[1]
+  let elBMT = document.querySelectorAll('.text-blue-600')[0]
+  let elTotal = document.querySelector('.text-orange-500')
+
+  if(elBNI) elBNI.innerText = formatRup(saldoBNI)
+  if(elBMT) elBMT.innerText = formatRup(saldoBMT)
+  if(elTotal) elTotal.innerText = formatRup(saldoBNI + saldoBMT)
 }
 
 // Jalankan pas web dibuka
