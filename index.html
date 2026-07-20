@@ -89,22 +89,33 @@
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://bvehkinicqzjumbbxbky.supabase.co'
-const SUPABASE_KEY = 'sb_publishable_lz-WpLBSUygXb0y4svX-KQ_Wb-38'
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+const API_URL = 'https://sheetdb.io/api/v1/7ng8bfwdhke6y' // API KAMU
 
 async function loadData() {
-  let { data, error } = await supabase.from('transaksi').select('*')
-  console.log("HASIL DARI SUPABASE:", data) // ini buat cek
-  if(error){ console.log('ERROR:', error); return }
+  try {
+    let res = await fetch(API_URL)
+    let data = await res.json()
+    console.log("HASIL DARI GOOGLE SHEETS:", data)
 
-  let totalMasuk = 0
-  data.forEach(trx => {
-    if (trx.jenis === 'masuk') totalMasuk += trx.jumlah
-  })
+    let totalMasuk = 0
+    let totalKeluar = 0
+    
+    data.forEach(trx => {
+      if (trx.jenis === 'masuk') totalMasuk += Number(trx.jumlah)
+      if (trx.jenis === 'keluar') totalKeluar += Number(trx.jumlah)
+    })
 
-  // Langsung ganti box pertama aja buat ngetes
-  document.querySelector('.text-3xl').innerText = 'Rp ' + totalMasuk.toLocaleString('id-ID')
+    let saldo = totalMasuk - totalKeluar
+
+    // TAMPILIN KE HTML
+    document.getElementById('totalMasuk').innerText = 'Rp ' + totalMasuk.toLocaleString('id-ID')
+    document.getElementById('totalKeluar').innerText = 'Rp ' + totalKeluar.toLocaleString('id-ID')
+    document.getElementById('saldo').innerText = 'Rp ' + saldo.toLocaleString('id-ID')
+
+  } catch(error) {
+    console.log('ERROR:', error)
+  }
 }
-loadData()
+
+loadData() // jalanin pas web dibuka
 </script>
