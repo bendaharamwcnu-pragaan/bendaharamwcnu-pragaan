@@ -14,7 +14,6 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center gap-3">
-        <!-- Logo Badge Internal (Pasti Muncul & Tidak Bikin Loading Macet) -->
         <div class="w-12 h-12 bg-green-700 text-white font-bold rounded-full flex items-center justify-center text-xs shadow border-2 border-green-800">
           NU
         </div>
@@ -23,7 +22,6 @@
           <p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p>
         </div>
       </div>
-      <!-- Tombol Login -->
       <button onclick="toggleModal(true)" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1 shadow">
         🔓 <span id="btnLoginText">Pengurus</span>
       </button>
@@ -110,9 +108,11 @@
   </div>
 
   <script>
-    const API_URL = 'https://sheetdb.io/api/v1/cspxgkgzue2gq/Sheet1';
+    const SPREADSHEET_ID = '1L8CAKR5cT7QPFi5s1a_XJMR8jk_2Wh2Jb1HJahcenoI';
+    const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
+
     const PIN_BENDAHARA = '1234'; 
-    const LINK_SPREADSHEET = 'https://docs.google.com/spreadsheets/d/1L8CAKR5cT7QPFi5s1a_XJMR8jk_2Wh2Jb1HJahcenoI/edit?gid=0#gid=0'; 
+    const LINK_SPREADSHEET = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=0#gid=0`; 
 
     const formatRupiah = (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
 
@@ -140,36 +140,44 @@
       const tahunSelected = document.getElementById('tahunFilter').value;
 
       try {
-        let res = await fetch(API_URL);
-        let data = await res.json();
+        let res = await fetch(GVIZ_URL);
+        let text = await res.text();
+        
+        // Bersihkan pembungkus JSON dari Google
+        let jsonString = text.substring(47, text.length - 2);
+        let rawData = JSON.parse(jsonString);
+
+        let rows = rawData.table.rows;
 
         let totalMasuk = 0;
         let totalKeluar = 0;
         let saldoBNI = 0;
         let saldoBMT = 0;
 
-        if (Array.isArray(data)) {
-          data.forEach(trx => {
-            let jumlah = Number(trx.jumlah || trx.Jumlah || trx.JUMLAH || 0);
-            let jenis = String(trx.jenis || trx.Jenis || trx.JENIS || '').toLowerCase().trim();
-            let rekening = String(trx.rekening || trx.Rekening || trx.REKENING || '').toLowerCase().trim();
-            let tanggal = String(trx.tanggal || trx.Tanggal || trx.TANGGAL || '');
+        rows.forEach(r => {
+          let c = r.c;
+          if (!c) return;
 
-            let cocokTahun = (tahunSelected === 'ALL') || tanggal.includes(tahunSelected);
+          // Ambil posisi kolom A (Tanggal), B (Jenis), C (Jumlah), E (Rekening)
+          let tanggal = String(c[0] ? (c[0].v || c[0].f || '') : '');
+          let jenis = String(c[1] ? (c[1].v || '') : '').toLowerCase().trim();
+          let jumlah = Number(c[2] ? (c[2].v || 0) : 0);
+          let rekening = String(c[4] ? (c[4].v || '') : '').toLowerCase().trim();
 
-            if (cocokTahun) {
-              if (jenis === 'masuk') {
-                totalMasuk += jumlah;
-                if (rekening.includes('bni')) saldoBNI += jumlah;
-                if (rekening.includes('bmt')) saldoBMT += jumlah;
-              } else if (jenis === 'keluar') {
-                totalKeluar += jumlah;
-                if (rekening.includes('bni')) saldoBNI -= jumlah;
-                if (rekening.includes('bmt')) saldoBMT -= jumlah;
-              }
+          let cocokTahun = (tahunSelected === 'ALL') || tanggal.includes(tahunSelected);
+
+          if (cocokTahun) {
+            if (jenis === 'masuk') {
+              totalMasuk += jumlah;
+              if (rekening.includes('bni')) saldoBNI += jumlah;
+              if (rekening.includes('bmt')) saldoBMT += jumlah;
+            } else if (jenis === 'keluar') {
+              totalKeluar += jumlah;
+              if (rekening.includes('bni')) saldoBNI -= jumlah;
+              if (rekening.includes('bmt')) saldoBMT -= jumlah;
             }
-          });
-        }
+          }
+        });
 
         let saldoBersih = totalMasuk - totalKeluar;
 
@@ -185,11 +193,10 @@
 
       } catch(error) {
         console.error('ERROR DATA:', error);
-        statusText.innerText = 'Gagal mengambil data dari Google Sheets.';
+        statusText.innerText = 'Gagal mengambil data langsung dari Google Sheets.';
       }
     }
 
-    // Jalankan pemanggilan data
     loadData();
   </script>
 </body>
