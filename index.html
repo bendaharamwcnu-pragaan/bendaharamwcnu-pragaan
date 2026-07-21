@@ -14,8 +14,8 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center gap-3">
-        <!-- Logo NU yang diperbaiki -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Nahdlatul_Ulama_Logo.svg" alt="Logo NU" class="w-12 h-12 object-contain">
+        <!-- Logo NU menggunakan CDN yang stabil -->
+        <img src="https://assets.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/2023/01/29/4260273763.png" alt="Logo NU" class="w-12 h-12 object-contain" id="imgLogo" onerror="this.src='https://cdns.klimg.com/merdeka.com/i/w/news/2021/01/30/1268686/content_images/670x335/20210130105307-1-logo-nu-001-fajar-januar.jpg'">
         <div>
           <h1 class="text-xl font-bold text-green-800">MWCNU PRAGAAN</h1>
           <p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p>
@@ -110,8 +110,6 @@
   <script>
     const API_URL = 'https://sheetdb.io/api/v1/cspxgkgzue2gq/Sheet1';
     const PIN_BENDAHARA = '1234'; 
-    
-    // LINK GOOGLE SHEETS TERHUBUNG
     const LINK_SPREADSHEET = 'https://docs.google.com/spreadsheets/d/1L8CAKR5cT7QPFi5s1a_XJMR8jk_2Wh2Jb1HJahcenoI/edit?gid=0#gid=0'; 
 
     const formatRupiah = (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
@@ -126,10 +124,7 @@
       const pin = document.getElementById('pinInput').value;
       if (pin === PIN_BENDAHARA) {
         alert('Login Berhasil! Mengarahkan ke Google Sheets...');
-        
-        // Membuka Google Sheets di tab baru
         window.open(LINK_SPREADSHEET, '_blank');
-        
         document.getElementById('btnLoginText').innerText = 'Pengurus';
         toggleModal(false);
         document.getElementById('pinInput').value = '';
@@ -157,7 +152,8 @@
           let rekening = String(trx.rekening || trx.Rekening || trx.REKENING || '').toLowerCase().trim();
           let tanggal = String(trx.tanggal || trx.Tanggal || trx.TANGGAL || '');
 
-          let cocokTahun = (tahunSelected === 'ALL') || tanggal.includes(tahunSelected);
+          // Pengecekan tahun yang lebih fleksibel (bisa membaca "20260718" atau "2026-07-18")
+          let cocokTahun = (tahunSelected === 'ALL') || tanggal.startsWith(tahunSelected) || tanggal.includes(tahunSelected);
 
           if (cocokTahun) {
             if (jenis === 'masuk') {
