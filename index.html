@@ -13,48 +13,49 @@
 <body class="bg-gray-50 p-4">
   <div class="max-w-md mx-auto relative">
 
- <!-- 1. BAR ATAS (HEADER PUTIH & PORTAL LOGIN) -->
-<div class="flex justify-between items-center bg-white p-3.5 rounded-2xl shadow-sm mb-4 border border-gray-100">
-  <div class="flex items-center gap-3">
-    <div class="w-10 h-10 bg-emerald-700 text-white font-bold rounded-full flex items-center justify-center text-xs shadow-inner">
-      NU
+    <!-- 1. BAR ATAS (HEADER PUTIH & PORTAL LOGIN) -->
+    <div class="flex justify-between items-center bg-white p-3.5 rounded-2xl shadow-sm mb-4 border border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-700 text-white font-bold rounded-full flex items-center justify-center text-xs shadow-inner">
+          NU
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-emerald-900 leading-tight">MWCNU Pragaan</h1>
+          <p class="text-[11px] text-gray-500 font-medium">Sistem Accounting Kas</p>
+        </div>
+      </div>
+
+      <button onclick="toggleModal(true)" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+        🔐 <span id="btnLoginText">Portal Login</span>
+      </button>
     </div>
-    <div>
-      <h1 class="text-base font-bold text-emerald-900 leading-tight">MWCNU Pragaan</h1>
-      <p class="text-[11px] text-gray-500 font-medium">Sistem Accounting Kas</p>
+
+    <!-- 2. GAMBAR ULAMA (DIBAWAH PORTAL LOGIN) -->
+    <div class="mb-4 overflow-hidden rounded-2xl shadow-md border border-gray-100">
+      <img src="pengurusmwcnu.png.jpg" alt="Pengurus MWCNU Pragaan" class="w-full h-auto block">
     </div>
-  </div>
 
-  <button onclick="toggleModal(true)" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-    🔐 <span id="btnLoginText">Portal Login</span>
-  </button>
-</div>
+    <!-- 3. BANNER HERO HIJAU -->
+    <div class="bg-emerald-900 text-white rounded-2xl p-6 text-center shadow-md mb-6">
+      <div class="flex justify-center mb-3">
+        <div class="w-10 h-10 bg-emerald-800/80 rounded-full flex items-center justify-center border border-emerald-700/50">
+          🌿
+        </div>
+      </div>
 
- <!-- 2. GAMBAR ULAMA (DIBAWAH PORTAL LOGIN) -->
-<div class="mb-4 overflow-hidden rounded-2xl shadow-md border border-gray-100">
-  <img src="pengurusmwcnu.png.jpg" alt="Pengurus MWCNU Pragaan" class="w-full h-auto block">
-</div>
-
-<!-- 3. BANNER HERO HIJAU -->
-<div class="bg-emerald-900 text-white rounded-2xl p-6 text-center shadow-md mb-6">
-  <div class="flex justify-center mb-3">
-    <div class="w-10 h-10 bg-emerald-800/80 rounded-full flex items-center justify-center border border-emerald-700/50">
-      🌿
+      <h2 class="text-xl font-extrabold tracking-wide mb-2 uppercase text-white">
+        MWCNU PRAGAAN
+      </h2>
+      
+      <div class="space-y-1 text-xs text-emerald-100/90 font-normal leading-relaxed max-w-sm mx-auto">
+        <p>Sistem Informasi Pelaporan Keuangan Terpadu</p>
+        <p class="font-medium">MWCNU Pragaan Masa Khidmat 2024-2029</p>
+        <p class="text-[11px] text-emerald-200/80 pt-1">
+          Mewujudkan Tata Kelola Kas Jam'iyah yang Transparan dan Akuntabel
+        </p>
+      </div>
     </div>
-  </div>
 
-  <h2 class="text-xl font-extrabold tracking-wide mb-2 uppercase text-white">
-    MWCNU PRAGAAN
-  </h2>
-  
-  <div class="space-y-1 text-xs text-emerald-100/90 font-normal leading-relaxed max-w-sm mx-auto">
-    <p>Sistem Informasi Pelaporan Keuangan Terpadu</p>
-    <p class="font-medium">MWCNU Pragaan Masa Khidmat 2024-2029</p>
-    <p class="text-[11px] text-emerald-200/80 pt-1">
-      Mewujudkan Tata Kelola Kas Jam'iyah yang Transparan dan Akuntabel
-    </p>
-  </div>
-</div>
     <!-- Filter Tahun -->
     <div class="bg-white rounded-2xl p-4 mb-4 shadow-sm">
       <div class="flex items-center justify-center gap-2 text-green-800 font-semibold mb-3">📅 Filter Tahun Buku</div>
@@ -82,7 +83,7 @@
       </div>
     </div>
 
-    <!-- Rincian Kas 2 Rekening -->
+    <!-- Rincian Kas (2 Rekening + 1 Kas Fisik) -->
     <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
       <h2 class="text-green-800 font-bold mb-3">💳 Rincian Saldo Kas</h2>
       <div class="space-y-3">
@@ -95,6 +96,7 @@
           <p class="text-xs text-gray-500 mb-2">No. Rek: 1921854722</p>
           <p class="text-2xl font-bold text-orange-700" id="saldoBNI">Rp 0</p>
         </div>
+
         <!-- BMT NUansaumat -->
         <div class="border border-blue-200 rounded-xl p-4 bg-blue-50">
           <div class="flex justify-between items-center mb-1">
@@ -104,9 +106,20 @@
           <p class="text-xs text-gray-500 mb-2">No. Rek: 01-120101000309</p>
           <p class="text-2xl font-bold text-blue-700" id="saldoBMT">Rp 0</p>
         </div>
+
+        <!-- Kas Fisik / Tunai (BARU) -->
+        <div class="border border-emerald-200 rounded-xl p-4 bg-emerald-50">
+          <div class="flex justify-between items-center mb-1">
+            <p class="font-semibold text-emerald-800">Kas Fisik / Tunai</p>
+            <span class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Tunai</span>
+          </div>
+          <p class="text-xs text-gray-500 mb-2">Penyimpanan: Pegangan Bendahara</p>
+          <p class="text-2xl font-bold text-emerald-700" id="saldoKasFisik">Rp 0</p>
+        </div>
+
         <!-- Total Gabungan -->
         <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
-          <p class="text-center text-sm text-gray-600">Total Kas 2 Rekening</p>
+          <p class="text-center text-sm text-gray-600">Total Kas (3 Sumber)</p>
           <p class="text-center text-2xl font-bold text-gray-800" id="totalGabungan">Rp 0</p>
         </div>
       </div>
@@ -124,9 +137,9 @@
 
       <hr class="border-gray-100">
 
-      <!-- Grafik 2: Perbandingan Kas Rekening -->
+      <!-- Grafik 2: Perbandingan Kas Rekening & Tunai -->
       <div>
-        <h2 class="text-green-800 font-bold mb-3">🍰 Distribusi Kas Rekening</h2>
+        <h2 class="text-green-800 font-bold mb-3">🍰 Distribusi Kas Rekening & Tunai</h2>
         <div class="relative h-56 flex justify-center">
           <canvas id="chartRekening"></canvas>
         </div>
@@ -187,7 +200,7 @@
       }
     }
 
-    function renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT) {
+    function renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT, saldoKasFisik) {
       const namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
       // Grafik Bulanan (Bar Chart)
@@ -237,10 +250,14 @@
       chartRekeningInstance = new Chart(ctxRekening, {
         type: 'doughnut',
         data: {
-          labels: ['Bank BNI', 'BMT NUansaumat'],
+          labels: ['Bank BNI', 'BMT NUansaumat', 'Kas Fisik'],
           datasets: [{
-            data: [saldoBNI > 0 ? saldoBNI : 0, saldoBMT > 0 ? saldoBMT : 0],
-            backgroundColor: ['#ea580c', '#2563eb']
+            data: [
+              saldoBNI > 0 ? saldoBNI : 0, 
+              saldoBMT > 0 ? saldoBMT : 0,
+              saldoKasFisik > 0 ? saldoKasFisik : 0
+            ],
+            backgroundColor: ['#ea580c', '#2563eb', '#059669']
           }]
         },
         options: {
@@ -269,6 +286,7 @@
         let totalKeluar = 0;
         let saldoBNI = 0;
         let saldoBMT = 0;
+        let saldoKasFisik = 0;
 
         let bulanMasuk = new Array(12).fill(0);
         let bulanKeluar = new Array(12).fill(0);
@@ -289,7 +307,7 @@
           let bulanIndex = -1;
           if (typeof rawDate === 'string' && rawDate.includes('Date(')) {
             let parts = rawDate.match(/\d+/g);
-            if (parts && parts.length >= 2) bulanIndex = parseInt(parts[1]); // Month in JS Date() is 0-indexed
+            if (parts && parts.length >= 2) bulanIndex = parseInt(parts[1]);
           } else if (typeof rawDate === 'string' && rawDate.includes('-')) {
             let parts = rawDate.split('-');
             if (parts.length >= 2) bulanIndex = parseInt(parts[1]) - 1;
@@ -299,14 +317,16 @@
             if (jenis === 'masuk') {
               totalMasuk += jumlah;
               if (rekening.includes('bni')) saldoBNI += jumlah;
-              if (rekening.includes('bmt')) saldoBMT += jumlah;
+              else if (rekening.includes('bmt')) saldoBMT += jumlah;
+              else if (rekening.includes('kas') || rekening.includes('fisik') || rekening.includes('tunai')) saldoKasFisik += jumlah;
 
               if (bulanIndex >= 0 && bulanIndex < 12) bulanMasuk[bulanIndex] += jumlah;
 
             } else if (jenis === 'keluar') {
               totalKeluar += jumlah;
               if (rekening.includes('bni')) saldoBNI -= jumlah;
-              if (rekening.includes('bmt')) saldoBMT -= jumlah;
+              else if (rekening.includes('bmt')) saldoBMT -= jumlah;
+              else if (rekening.includes('kas') || rekening.includes('fisik') || rekening.includes('tunai')) saldoKasFisik -= jumlah;
 
               if (bulanIndex >= 0 && bulanIndex < 12) bulanKeluar[bulanIndex] += jumlah;
             }
@@ -321,10 +341,11 @@
 
         document.getElementById('saldoBNI').innerText = formatRupiah(saldoBNI);
         document.getElementById('saldoBMT').innerText = formatRupiah(saldoBMT);
-        document.getElementById('totalGabungan').innerText = formatRupiah(saldoBNI + saldoBMT);
+        document.getElementById('saldoKasFisik').innerText = formatRupiah(saldoKasFisik);
+        document.getElementById('totalGabungan').innerText = formatRupiah(saldoBNI + saldoBMT + saldoKasFisik);
 
         // Render Grafik
-        renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT);
+        renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT, saldoKasFisik);
 
         statusText.innerText = 'Data berhasil dimuat (' + (tahunSelected === 'ALL' ? 'Semua Tahun' : 'Tahun ' + tahunSelected) + ')';
 
