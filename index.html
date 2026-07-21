@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accounting MWCNU PRAGAAN</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Library Grafik Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>body{font-family:'Poppins',sans-serif}</style>
 </head>
@@ -84,6 +86,27 @@
       </div>
     </div>
 
+    <!-- BAGIAN GRAFIK -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm mb-4 space-y-6">
+      <!-- Grafik 1: Arus Kas Bulanan -->
+      <div>
+        <h2 class="text-green-800 font-bold mb-3">📈 Grafik Arus Kas Bulanan</h2>
+        <div class="relative h-64">
+          <canvas id="chartBulanan"></canvas>
+        </div>
+      </div>
+
+      <hr class="border-gray-100">
+
+      <!-- Grafik 2: Perbandingan Kas Rekening -->
+      <div>
+        <h2 class="text-green-800 font-bold mb-3">🍰 Distribusi Kas Rekening</h2>
+        <div class="relative h-56 flex justify-center">
+          <canvas id="chartRekening"></canvas>
+        </div>
+      </div>
+    </div>
+
     <!-- Status Text -->
     <div class="bg-white rounded-2xl p-4 shadow-sm">
       <h2 class="text-green-800 font-bold mb-3">📊 Status Data</h2>
@@ -116,6 +139,9 @@
 
     const formatRupiah = (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
 
+    let chartBulananInstance = null;
+    let chartRekeningInstance = null;
+
     function toggleModal(show) {
       const modal = document.getElementById('loginModal');
       modal.classList.toggle('hidden', !show);
@@ -135,6 +161,72 @@
       }
     }
 
+    function renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT) {
+      const namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+      // Grafik Bulanan (Bar Chart)
+      const ctxBulanan = document.getElementById('chartBulanan').getContext('2d');
+      if (chartBulananInstance) chartBulananInstance.destroy();
+
+      chartBulananInstance = new Chart(ctxBulanan, {
+        type: 'bar',
+        data: {
+          labels: namaBulan,
+          datasets: [
+            {
+              label: 'Masuk',
+              data: bulanMasuk,
+              backgroundColor: '#16a34a',
+              borderRadius: 4
+            },
+            {
+              label: 'Keluar',
+              data: bulanKeluar,
+              backgroundColor: '#dc2626',
+              borderRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: (val) => 'Rp ' + (val / 1000000).toFixed(0) + 'Jt'
+              }
+            }
+          }
+        }
+      });
+
+      // Grafik Rekening (Doughnut/Pie Chart)
+      const ctxRekening = document.getElementById('chartRekening').getContext('2d');
+      if (chartRekeningInstance) chartRekeningInstance.destroy();
+
+      chartRekeningInstance = new Chart(ctxRekening, {
+        type: 'doughnut',
+        data: {
+          labels: ['Bank BNI', 'BMT NUansaumat'],
+          datasets: [{
+            data: [saldoBNI > 0 ? saldoBNI : 0, saldoBMT > 0 ? saldoBMT : 0],
+            backgroundColor: ['#ea580c', '#2563eb']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
     async function loadData() {
       const statusText = document.getElementById('statusText');
       const tahunSelected = document.getElementById('tahunFilter').value;
@@ -143,10 +235,8 @@
         let res = await fetch(GVIZ_URL);
         let text = await res.text();
         
-        // Bersihkan pembungkus JSON dari Google
         let jsonString = text.substring(47, text.length - 2);
         let rawData = JSON.parse(jsonString);
-
         let rows = rawData.table.rows;
 
         let totalMasuk = 0;
@@ -154,27 +244,45 @@
         let saldoBNI = 0;
         let saldoBMT = 0;
 
+        let bulanMasuk = new Array(12).fill(0);
+        let bulanKeluar = new Array(12).fill(0);
+
         rows.forEach(r => {
           let c = r.c;
           if (!c) return;
 
-          // Ambil posisi kolom A (Tanggal), B (Jenis), C (Jumlah), E (Rekening)
-          let tanggal = String(c[0] ? (c[0].v || c[0].f || '') : '');
+          let rawDate = c[0] ? (c[0].v || c[0].f || '') : '';
           let jenis = String(c[1] ? (c[1].v || '') : '').toLowerCase().trim();
           let jumlah = Number(c[2] ? (c[2].v || 0) : 0);
           let rekening = String(c[4] ? (c[4].v || '') : '').toLowerCase().trim();
 
-          let cocokTahun = (tahunSelected === 'ALL') || tanggal.includes(tahunSelected);
+          let tglStr = String(rawDate);
+          let cocokTahun = (tahunSelected === 'ALL') || tglStr.includes(tahunSelected);
+
+          // Ambil Indeks Bulan (0-11)
+          let bulanIndex = -1;
+          if (typeof rawDate === 'string' && rawDate.includes('Date(')) {
+            let parts = rawDate.match(/\d+/g);
+            if (parts && parts.length >= 2) bulanIndex = parseInt(parts[1]); // Month in JS Date() is 0-indexed
+          } else if (typeof rawDate === 'string' && rawDate.includes('-')) {
+            let parts = rawDate.split('-');
+            if (parts.length >= 2) bulanIndex = parseInt(parts[1]) - 1;
+          }
 
           if (cocokTahun) {
             if (jenis === 'masuk') {
               totalMasuk += jumlah;
               if (rekening.includes('bni')) saldoBNI += jumlah;
               if (rekening.includes('bmt')) saldoBMT += jumlah;
+
+              if (bulanIndex >= 0 && bulanIndex < 12) bulanMasuk[bulanIndex] += jumlah;
+
             } else if (jenis === 'keluar') {
               totalKeluar += jumlah;
               if (rekening.includes('bni')) saldoBNI -= jumlah;
               if (rekening.includes('bmt')) saldoBMT -= jumlah;
+
+              if (bulanIndex >= 0 && bulanIndex < 12) bulanKeluar[bulanIndex] += jumlah;
             }
           }
         });
@@ -188,6 +296,9 @@
         document.getElementById('saldoBNI').innerText = formatRupiah(saldoBNI);
         document.getElementById('saldoBMT').innerText = formatRupiah(saldoBMT);
         document.getElementById('totalGabungan').innerText = formatRupiah(saldoBNI + saldoBMT);
+
+        // Render Grafik
+        renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT);
 
         statusText.innerText = 'Data berhasil dimuat (' + (tahunSelected === 'ALL' ? 'Semua Tahun' : 'Tahun ' + tahunSelected) + ')';
 
