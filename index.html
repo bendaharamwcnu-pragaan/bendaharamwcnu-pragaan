@@ -14,13 +14,14 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center gap-3">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Nahdlatul_Ulama_Logo.svg/1200px-Nahdlatul_Ulama_Logo.svg.png" alt="Logo NU" class="w-10 h-10 object-contain">
+        <!-- Logo NU yang diperbaiki -->
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Nahdlatul_Ulama_Logo.svg" alt="Logo NU" class="w-12 h-12 object-contain">
         <div>
           <h1 class="text-xl font-bold text-green-800">MWCNU PRAGAAN</h1>
           <p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p>
         </div>
       </div>
-      <!-- Tombol Login Berfungsi -->
+      <!-- Tombol Login -->
       <button onclick="toggleModal(true)" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1 shadow">
         🔓 <span id="btnLoginText">Login</span>
       </button>
@@ -83,10 +84,10 @@
       </div>
     </div>
 
-    <!-- Grafik Placeholder -->
+    <!-- Status Text -->
     <div class="bg-white rounded-2xl p-4 shadow-sm">
-      <h2 class="text-green-800 font-bold mb-3">📊 Arus Kas</h2>
-      <p class="text-center text-gray-400 text-sm py-4" id="statusText">Memuat data dari Google Sheets...</p>
+      <h2 class="text-green-800 font-bold mb-3">📊 Status Data</h2>
+      <p class="text-center text-gray-500 text-sm py-2" id="statusText">Memuat data...</p>
     </div>
 
   </div>
@@ -108,11 +109,13 @@
 
   <script>
     const API_URL = 'https://sheetdb.io/api/v1/cspxgkgzue2gq/Sheet1';
-    const PIN_BENDAHARA = '1234'; // Ganti PIN login di sini
+    const PIN_BENDAHARA = '1234'; 
+    
+    // LINK GOOGLE SHEETS TERHUBUNG
+    const LINK_SPREADSHEET = 'https://docs.google.com/spreadsheets/d/1L8CAKR5cT7QPFi5s1a_XJMR8jk_2Wh2Jb1HJahcenoI/edit?gid=0#gid=0'; 
 
     const formatRupiah = (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
 
-    // Fungsi Pop-up Login
     function toggleModal(show) {
       const modal = document.getElementById('loginModal');
       modal.classList.toggle('hidden', !show);
@@ -122,7 +125,11 @@
     function prosesLogin() {
       const pin = document.getElementById('pinInput').value;
       if (pin === PIN_BENDAHARA) {
-        alert('Login Berhasil! Selamat datang Bendahara.');
+        alert('Login Berhasil! Mengarahkan ke Google Sheets...');
+        
+        // Membuka Google Sheets di tab baru
+        window.open(LINK_SPREADSHEET, '_blank');
+        
         document.getElementById('btnLoginText').innerText = 'Pengurus';
         toggleModal(false);
         document.getElementById('pinInput').value = '';
@@ -138,7 +145,6 @@
       try {
         let res = await fetch(API_URL);
         let data = await res.json();
-        console.log("DATA SPREADSHEET:", data);
 
         let totalMasuk = 0;
         let totalKeluar = 0;
@@ -146,13 +152,11 @@
         let saldoBMT = 0;
 
         data.forEach(trx => {
-          // Normalisasi Nama Kolom (Cari nama kolom yang cocok)
           let jumlah = Number(trx.jumlah || trx.Jumlah || trx.JUMLAH) || 0;
           let jenis = String(trx.jenis || trx.Jenis || trx.JENIS || '').toLowerCase().trim();
           let rekening = String(trx.rekening || trx.Rekening || trx.REKENING || '').toLowerCase().trim();
           let tanggal = String(trx.tanggal || trx.Tanggal || trx.TANGGAL || '');
 
-          // Pengecekan Filter Tahun
           let cocokTahun = (tahunSelected === 'ALL') || tanggal.includes(tahunSelected);
 
           if (cocokTahun) {
@@ -170,7 +174,6 @@
 
         let saldoBersih = totalMasuk - totalKeluar;
 
-        // Tampilkan Ke Tampilan
         document.getElementById('arusMasuk').innerText = formatRupiah(totalMasuk);
         document.getElementById('arusKeluar').innerText = formatRupiah(totalKeluar);
         document.getElementById('saldoBersih').innerText = formatRupiah(saldoBersih);
@@ -179,11 +182,11 @@
         document.getElementById('saldoBMT').innerText = formatRupiah(saldoBMT);
         document.getElementById('totalGabungan').innerText = formatRupiah(saldoBNI + saldoBMT);
 
-        statusText.innerText = 'Data berhasil dimuat untuk tahun ' + tahunSelected;
+        statusText.innerText = 'Data berhasil dimuat (' + (tahunSelected === 'ALL' ? 'Semua Tahun' : 'Tahun ' + tahunSelected) + ')';
 
       } catch(error) {
         console.error('ERROR DATA:', error);
-        statusText.innerText = 'Gagal memuat data dari Spreadsheet.';
+        statusText.innerText = 'Gagal mengambil data dari Google Sheets.';
       }
     }
 
