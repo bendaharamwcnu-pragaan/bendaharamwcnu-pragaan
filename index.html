@@ -14,8 +14,10 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center gap-3">
-        <!-- Logo NU SVG Resmi Wikipedia (Pasti Cepat & Ringan) -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Nahdlatul_Ulama_Logo.svg" alt="Logo NU" class="w-12 h-12 object-contain">
+        <!-- Logo Badge Internal (Pasti Muncul & Tidak Bikin Loading Macet) -->
+        <div class="w-12 h-12 bg-green-700 text-white font-bold rounded-full flex items-center justify-center text-xs shadow border-2 border-green-800">
+          NU
+        </div>
         <div>
           <h1 class="text-xl font-bold text-green-800">MWCNU PRAGAAN</h1>
           <p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p>
@@ -23,7 +25,7 @@
       </div>
       <!-- Tombol Login -->
       <button onclick="toggleModal(true)" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1 shadow">
-        🔓 <span id="btnLoginText">Login</span>
+        🔓 <span id="btnLoginText">Pengurus</span>
       </button>
     </div>
 
@@ -148,14 +150,12 @@
 
         if (Array.isArray(data)) {
           data.forEach(trx => {
-            // Ambil data nilai terlepas dari variasi nama header
             let jumlah = Number(trx.jumlah || trx.Jumlah || trx.JUMLAH || 0);
             let jenis = String(trx.jenis || trx.Jenis || trx.JENIS || '').toLowerCase().trim();
             let rekening = String(trx.rekening || trx.Rekening || trx.REKENING || '').toLowerCase().trim();
             let tanggal = String(trx.tanggal || trx.Tanggal || trx.TANGGAL || '');
 
-            // Pengecekan Tahun
-            let cocokTahun = (tahunSelected === 'ALL') || tanggal.startsWith(tahunSelected) || tanggal.includes(tahunSelected);
+            let cocokTahun = (tahunSelected === 'ALL') || tanggal.includes(tahunSelected);
 
             if (cocokTahun) {
               if (jenis === 'masuk') {
