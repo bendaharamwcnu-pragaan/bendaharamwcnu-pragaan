@@ -14,19 +14,20 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center gap-3">
-        <img src="https://www.google.com/search?q=logo+nu+png&oq=logo+nu&aqs=chrome.1.69i57j0i512l9.4544j0j4&sourceid=chrome&ie=UTF-8#sv=CAMSNhowKg44TXZlOWNHUkF1anNSTTIOOE12ZTljR1JBdWpzUk06Dk0wbFRMMmFHN21fcGpNIAQ4ABgHIP7qiMQLSggQARgBIAEoAQ
+        <!-- Tag img sudah diperbaiki -->
+        <img src="https://via.placeholder.com/40?text=NU" alt="Logo NU" class="w-10 h-10 rounded-full">
         <div>
           <h1 class="text-xl font-bold text-green-800">MWCNU PRAGAAN</h1>
           <p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p>
         </div>
       </div>
-      <button class="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold">🔓 Login</button>
+      <button class="bg-green-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-800 transition">🔓 Login</button>
     </div>
 
     <!-- Filter Tahun -->
     <div class="bg-white rounded-2xl p-4 mb-4 shadow-sm">
       <div class="flex items-center justify-center gap-2 text-green-800 font-semibold mb-3">📅 Filter Tahun Buku</div>
-      <select id="tahunFilter" class="w-full border rounded-lg p-3 text-center font-medium">
+      <select id="tahunFilter" class="w-full border rounded-lg p-3 text-center font-medium bg-gray-50">
         <option value="2026">2026</option>
         <option value="2025">2025</option>
         <option value="2024">2024</option>
@@ -82,39 +83,64 @@
     <!-- Grafik -->
     <div class="bg-white rounded-2xl p-4 shadow-sm">
       <h2 class="text-green-800 font-bold mb-3">📊 Arus Kas</h2>
-      <p class="text-center text-gray-400 text-sm">Grafik akan muncul setelah ada data</p>
+      <p class="text-center text-gray-400 text-sm py-4">Grafik akan muncul setelah ada data</p>
     </div>
 
   </div>
 
-<script>
-const API_URL = 'https://sheetdb.io/api/v1/cspxgkgzue2gq/Sheet1' // API KAMU
+  <script>
+    const API_URL = 'https://sheetdb.io/api/v1/cspxgkgzue2gq/Sheet1';
 
-async function loadData() {
-  try {
-    let res = await fetch(API_URL)
-    let data = await res.json()
-    console.log("HASIL DARI GOOGLE SHEETS:", data)
+    // Format angka ke Rupiah
+    const formatRupiah = (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
 
-    let totalMasuk = 0
-    let totalKeluar = 0
-    
-    data.forEach(trx => {
-      if (trx.jenis === 'masuk') totalMasuk += Number(trx.jumlah)
-      if (trx.jenis === 'keluar') totalKeluar += Number(trx.jumlah)
-    })
+    async function loadData() {
+      try {
+        let res = await fetch(API_URL);
+        let data = await res.json();
+        console.log("HASIL DARI GOOGLE SHEETS:", data);
 
-    let saldo = totalMasuk - totalKeluar
+        let totalMasuk = 0;
+        let totalKeluar = 0;
+        let saldoBNI = 0;
+        let saldoBMT = 0;
 
-    // TAMPILIN KE HTML
-    document.getElementById('totalMasuk').innerText = 'Rp ' + totalMasuk.toLocaleString('id-ID')
-    document.getElementById('totalKeluar').innerText = 'Rp ' + totalKeluar.toLocaleString('id-ID')
-    document.getElementById('saldo').innerText = 'Rp ' + saldo.toLocaleString('id-ID')
+        data.forEach(trx => {
+          let jumlah = Number(trx.jumlah) || 0;
+          let jenis = String(trx.jenis).toLowerCase().trim();
+          let rekening = String(trx.rekening || '').toLowerCase().trim();
 
-  } catch(error) {
-    console.log('ERROR:', error)
-  }
-}
+          // Hitung Arus Masuk & Keluar
+          if (jenis === 'masuk') {
+            totalMasuk += jumlah;
+            if (rekening.includes('bni')) saldoBNI += jumlah;
+            if (rekening.includes('bmt')) saldoBMT += jumlah;
+          } else if (jenis === 'keluar') {
+            totalKeluar += jumlah;
+            if (rekening.includes('bni')) saldoBNI -= jumlah;
+            if (rekening.includes('bmt')) saldoBMT -= jumlah;
+          }
+        });
 
-loadData() // jalanin pas web dibuka
-</script>
+        let saldoBersih = totalMasuk - totalKeluar;
+
+        // TAMPILKAN KE HTML (ID disesuaikan dengan tag HTML)
+        document.getElementById('arusMasuk').innerText = formatRupiah(totalMasuk);
+        document.getElementById('arusKeluar').innerText = formatRupiah(totalKeluar);
+        document.getElementById('saldoBersih').innerText = formatRupiah(saldoBersih);
+        
+        // Tampilkan Per-Rekening
+        document.getElementById('saldoBNI').innerText = formatRupiah(saldoBNI);
+        document.getElementById('saldoBMT').innerText = formatRupiah(saldoBMT);
+        document.getElementById('totalGabungan').innerText = formatRupiah(saldoBNI + saldoBMT);
+
+      } catch(error) {
+        console.error('ERROR SAAT MENGAMBIL DATA:', error);
+      }
+    }
+
+    // Jalankan fungsi saat halaman selesai dimuat
+    loadData();
+  </script>
+</body>
+</html>
