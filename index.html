@@ -14,8 +14,8 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center gap-3">
-        <!-- Logo NU menggunakan CDN yang stabil -->
-        <img src="https://assets.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/2023/01/29/4260273763.png" alt="Logo NU" class="w-12 h-12 object-contain" id="imgLogo" onerror="this.src='https://cdns.klimg.com/merdeka.com/i/w/news/2021/01/30/1268686/content_images/670x335/20210130105307-1-logo-nu-001-fajar-januar.jpg'">
+        <!-- Logo NU SVG Resmi Wikipedia (Pasti Cepat & Ringan) -->
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Nahdlatul_Ulama_Logo.svg" alt="Logo NU" class="w-12 h-12 object-contain">
         <div>
           <h1 class="text-xl font-bold text-green-800">MWCNU PRAGAAN</h1>
           <p class="text-xs text-gray-500">Bendahara - Kas 2 Rekening</p>
@@ -146,27 +146,30 @@
         let saldoBNI = 0;
         let saldoBMT = 0;
 
-        data.forEach(trx => {
-          let jumlah = Number(trx.jumlah || trx.Jumlah || trx.JUMLAH) || 0;
-          let jenis = String(trx.jenis || trx.Jenis || trx.JENIS || '').toLowerCase().trim();
-          let rekening = String(trx.rekening || trx.Rekening || trx.REKENING || '').toLowerCase().trim();
-          let tanggal = String(trx.tanggal || trx.Tanggal || trx.TANGGAL || '');
+        if (Array.isArray(data)) {
+          data.forEach(trx => {
+            // Ambil data nilai terlepas dari variasi nama header
+            let jumlah = Number(trx.jumlah || trx.Jumlah || trx.JUMLAH || 0);
+            let jenis = String(trx.jenis || trx.Jenis || trx.JENIS || '').toLowerCase().trim();
+            let rekening = String(trx.rekening || trx.Rekening || trx.REKENING || '').toLowerCase().trim();
+            let tanggal = String(trx.tanggal || trx.Tanggal || trx.TANGGAL || '');
 
-          // Pengecekan tahun yang lebih fleksibel (bisa membaca "20260718" atau "2026-07-18")
-          let cocokTahun = (tahunSelected === 'ALL') || tanggal.startsWith(tahunSelected) || tanggal.includes(tahunSelected);
+            // Pengecekan Tahun
+            let cocokTahun = (tahunSelected === 'ALL') || tanggal.startsWith(tahunSelected) || tanggal.includes(tahunSelected);
 
-          if (cocokTahun) {
-            if (jenis === 'masuk') {
-              totalMasuk += jumlah;
-              if (rekening.includes('bni')) saldoBNI += jumlah;
-              if (rekening.includes('bmt')) saldoBMT += jumlah;
-            } else if (jenis === 'keluar') {
-              totalKeluar += jumlah;
-              if (rekening.includes('bni')) saldoBNI -= jumlah;
-              if (rekening.includes('bmt')) saldoBMT -= jumlah;
+            if (cocokTahun) {
+              if (jenis === 'masuk') {
+                totalMasuk += jumlah;
+                if (rekening.includes('bni')) saldoBNI += jumlah;
+                if (rekening.includes('bmt')) saldoBMT += jumlah;
+              } else if (jenis === 'keluar') {
+                totalKeluar += jumlah;
+                if (rekening.includes('bni')) saldoBNI -= jumlah;
+                if (rekening.includes('bmt')) saldoBMT -= jumlah;
+              }
             }
-          }
-        });
+          });
+        }
 
         let saldoBersih = totalMasuk - totalKeluar;
 
@@ -186,6 +189,7 @@
       }
     }
 
+    // Jalankan pemanggilan data
     loadData();
   </script>
 </body>
