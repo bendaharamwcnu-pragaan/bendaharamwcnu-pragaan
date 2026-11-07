@@ -1,395 +1,344 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Accounting MWCNU PRAGAAN</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Library Grafik Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>body{font-family:'Poppins',sans-serif}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accounting MWCNU PRAGAAN</title>
+<script src="[https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.js](https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.js)"></script>
+<!-- Library Grafik Chart.js -->
+<script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)"></script>
+<link href="[https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap](https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap)" rel="stylesheet">
+<style>body{font-family:'Poppins',sans-serif}</style>
 </head>
 <body class="bg-gray-50 p-4">
-  <div class="max-w-md mx-auto relative">
-
-    <!-- 1. BAR ATAS (HEADER PUTIH & PORTAL LOGIN) -->
-    <div class="flex justify-between items-center bg-white p-3.5 rounded-2xl shadow-sm mb-4 border border-gray-100">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-emerald-700 text-white font-bold rounded-full flex items-center justify-center text-xs shadow-inner">
-          NU
-        </div>
-        <div>
-          <h1 class="text-base font-bold text-emerald-900 leading-tight">MWCNU Pragaan</h1>
-          <p class="text-[11px] text-gray-500 font-medium">Sistem Accounting Kas</p>
-        </div>
-      </div>
-
-      <button onclick="toggleModal(true)" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-        🔐 <span id="btnLoginText">Portal Login</span>
-      </button>
-    </div>
-
-    <!-- 2. GAMBAR ULAMA (DIBAWAH PORTAL LOGIN) -->
-    <div class="mb-4 overflow-hidden rounded-2xl shadow-md border border-gray-100">
-      <img src="pengurusmwcnu.png.jpg" alt="Pengurus MWCNU Pragaan" class="w-full h-auto block">
-    </div>
-
-    <!-- 3. BANNER HERO HIJAU -->
-    <div class="bg-emerald-900 text-white rounded-2xl p-6 text-center shadow-md mb-6">
-      <div class="flex justify-center mb-3">
-        <div class="w-10 h-10 bg-emerald-800/80 rounded-full flex items-center justify-center border border-emerald-700/50">
-          🌿
-        </div>
-      </div>
-
-      <h2 class="text-xl font-extrabold tracking-wide mb-2 uppercase text-white">
-        MWCNU PRAGAAN
-      </h2>
-      
-      <div class="space-y-1 text-xs text-emerald-100/90 font-normal leading-relaxed max-w-sm mx-auto">
-        <p>Sistem Informasi Pelaporan Keuangan Terpadu</p>
-        <p class="font-medium">MWCNU Pragaan Masa Khidmat 2024-2029</p>
-        <p class="text-[11px] text-emerald-200/80 pt-1">
-          Mewujudkan Tata Kelola Kas Jam'iyah yang Transparan dan Akuntabel
-        </p>
-      </div>
-    </div>
-
-    <!-- Filter Tahun & Bulan (BARU) -->
-    <div class="bg-white rounded-2xl p-4 mb-4 shadow-sm space-y-3">
-      <div class="flex items-center justify-center gap-2 text-green-800 font-semibold">📅 Filter Periode Buku</div>
-      
-      <div class="grid grid-cols-2 gap-2">
-        <!-- Filter Tahun -->
-        <div>
-          <label class="text-[10px] text-gray-500 font-medium block mb-1">Tahun:</label>
-          <select id="tahunFilter" onchange="loadData()" class="w-full border rounded-lg p-2.5 text-center font-medium bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none text-xs">
-            <option value="ALL">-- Semua --</option>
-            <option value="2026" selected>2026</option>
-            <option value="2025">2025</option>
-            <option value="2024">2024</option>
-          </select>
-        </div>
-
-        <!-- Filter Bulan -->
-        <div>
-          <label class="text-[10px] text-gray-500 font-medium block mb-1">Bulan:</label>
-          <select id="bulanFilter" onchange="loadData()" class="w-full border rounded-lg p-2.5 text-center font-medium bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none text-xs">
-            <option value="ALL" selected>-- Semua Bulan --</option>
-            <option value="0">Januari</option>
-            <option value="1">Februari</option>
-            <option value="2">Maret</option>
-            <option value="3">April</option>
-            <option value="4">Mei</option>
-            <option value="5">Juni</option>
-            <option value="6">Juli</option>
-            <option value="7">Agustus</option>
-            <option value="8">September</option>
-            <option value="9">Oktober</option>
-            <option value="10">November</option>
-            <option value="11">Desember</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ringkasan Total -->
-    <div class="space-y-3 mb-4">
-      <div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl p-5 shadow">
-        <p class="text-sm opacity-90">Total Arus Masuk</p>
-        <p class="text-3xl font-bold" id="arusMasuk">Rp 0</p>
-      </div>
-      <div class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl p-5 shadow">
-        <p class="text-sm opacity-90">Total Arus Keluar</p>
-        <p class="text-3xl font-bold" id="arusKeluar">Rp 0</p>
-      </div>
-      <div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-2xl p-5 shadow">
-        <p class="text-sm opacity-90">Saldo Bersih</p>
-        <p class="text-3xl font-bold" id="saldoBersih">Rp 0</p>
-      </div>
-    </div>
-
-    <!-- Rincian Kas (2 Rekening + 1 Kas Fisik) -->
-    <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
-      <h2 class="text-green-800 font-bold mb-3">💳 Rincian Saldo Kas</h2>
-      <div class="space-y-3">
-        <!-- BNI -->
-        <div class="border border-orange-200 rounded-xl p-4 bg-orange-50">
-          <div class="flex justify-between items-center mb-1">
-            <p class="font-semibold text-orange-800">Bank BNI</p>
-            <span class="text-xs bg-orange-600 text-white px-2 py-1 rounded">Rek 1</span>
-          </div>
-          <p class="text-xs text-gray-500 mb-2">No. Rek: 1921854722</p>
-          <p class="text-2xl font-bold text-orange-700" id="saldoBNI">Rp 0</p>
-        </div>
-
-        <!-- BMT NUansaumat -->
-        <div class="border border-blue-200 rounded-xl p-4 bg-blue-50">
-          <div class="flex justify-between items-center mb-1">
-            <p class="font-semibold text-blue-800">BMT NUansaumat</p>
-            <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Rek 2</span>
-          </div>
-          <p class="text-xs text-gray-500 mb-2">No. Rek: 01-120101000309</p>
-          <p class="text-2xl font-bold text-blue-700" id="saldoBMT">Rp 0</p>
-        </div>
-
-        <!-- Kas Fisik / Tunai -->
-        <div class="border border-emerald-200 rounded-xl p-4 bg-emerald-50">
-          <div class="flex justify-between items-center mb-1">
-            <p class="font-semibold text-emerald-800">Kas Fisik / Tunai</p>
-            <span class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Tunai</span>
-          </div>
-          <p class="text-xs text-gray-500 mb-2">Penyimpanan: Pegangan Bendahara</p>
-          <p class="text-2xl font-bold text-emerald-700" id="saldoKasFisik">Rp 0</p>
-        </div>
-
-        <!-- Total Gabungan -->
-        <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
-          <p class="text-center text-sm text-gray-600">Total Kas (3 Sumber)</p>
-          <p class="text-center text-2xl font-bold text-gray-800" id="totalGabungan">Rp 0</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- BAGIAN GRAFIK -->
-    <div class="bg-white rounded-2xl p-4 shadow-sm mb-4 space-y-6">
-      <!-- Grafik 1: Arus Kas Bulanan -->
-      <div>
-        <h2 class="text-green-800 font-bold mb-3">📈 Grafik Arus Kas Bulanan</h2>
-        <div class="relative h-64">
-          <canvas id="chartBulanan"></canvas>
-        </div>
-      </div>
-
-      <hr class="border-gray-100">
-
-      <!-- Grafik 2: Perbandingan Kas Rekening & Tunai -->
-      <div>
-        <h2 class="text-green-800 font-bold mb-3">🍰 Distribusi Kas Rekening & Tunai</h2>
-        <div class="relative h-56 flex justify-center">
-          <canvas id="chartRekening"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Status Text -->
-    <div class="bg-white rounded-2xl p-4 shadow-sm">
-      <h2 class="text-green-800 font-bold mb-3">📊 Status Data</h2>
-      <p class="text-center text-gray-500 text-sm py-2" id="statusText">Memuat data...</p>
-    </div>
-
-  </div>
-
-  <!-- POPUP MODAL LOGIN -->
-  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-xs shadow-xl text-center">
-      <h3 class="text-lg font-bold text-green-800 mb-2">🔒 Login Bendahara</h3>
-      <p class="text-xs text-gray-500 mb-4">Masukkan PIN Akses Pengurus</p>
-      
-      <input type="password" id="pinInput" placeholder="Masukkan PIN" class="w-full border rounded-lg p-3 text-center mb-4 text-lg tracking-widest outline-none focus:ring-2 focus:ring-green-600">
-      
-      <div class="flex gap-2">
-        <button onclick="toggleModal(false)" class="w-1/2 bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-300">Batal</button>
-        <button onclick="prosesLogin()" class="w-1/2 bg-green-700 text-white py-2 rounded-lg font-semibold hover:bg-green-800">Masuk</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const SPREADSHEET_ID = '1L8CAKR5cT7QPFi5s1a_XJMR8jk_2Wh2Jb1HJahcenoI';
-    const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
-
-    const PIN_BENDAHARA = '999'; 
-    const LINK_SPREADSHEET = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=0#gid=0`; 
-
-    const formatRupiah = (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
-
-    let chartBulananInstance = null;
-    let chartRekeningInstance = null;
-
-    function toggleModal(show) {
-      const modal = document.getElementById('loginModal');
-      modal.classList.toggle('hidden', !show);
-      if(show) document.getElementById('pinInput').focus();
-    }
-
-    function prosesLogin() {
-      const pin = document.getElementById('pinInput').value;
-      if (pin === PIN_BENDAHARA) {
-        alert('Login Berhasil! Mengarahkan ke Google Sheets...');
-        window.open(LINK_SPREADSHEET, '_blank');
-        document.getElementById('btnLoginText').innerText = 'Pengurus';
-        toggleModal(false);
-        document.getElementById('pinInput').value = '';
-      } else {
-        alert('PIN Salah! Silakan coba lagi.');
-      }
-    }
-
-    function renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT, saldoKasFisik) {
-      const namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-
-      // Grafik Bulanan (Bar Chart)
-      const ctxBulanan = document.getElementById('chartBulanan').getContext('2d');
-      if (chartBulananInstance) chartBulananInstance.destroy();
-
-      chartBulananInstance = new Chart(ctxBulanan, {
-        type: 'bar',
-        data: {
-          labels: namaBulan,
-          datasets: [
-            {
-              label: 'Masuk',
-              data: bulanMasuk,
-              backgroundColor: '#16a34a',
-              borderRadius: 4
-            },
-            {
-              label: 'Keluar',
-              data: bulanKeluar,
-              backgroundColor: '#dc2626',
-              borderRadius: 4
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom' }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: (val) => 'Rp ' + (val / 1000000).toFixed(0) + 'Jt'
-              }
-            }
-          }
-        }
-      });
-
-      // Grafik Rekening (Doughnut/Pie Chart)
-      const ctxRekening = document.getElementById('chartRekening').getContext('2d');
-      if (chartRekeningInstance) chartRekeningInstance.destroy();
-
-      chartRekeningInstance = new Chart(ctxRekening, {
-        type: 'doughnut',
-        data: {
-          labels: ['Bank BNI', 'BMT NUansaumat', 'Kas Fisik'],
-          datasets: [{
-            data: [
-              saldoBNI > 0 ? saldoBNI : 0, 
-              saldoBMT > 0 ? saldoBMT : 0,
-              saldoKasFisik > 0 ? saldoKasFisik : 0
-            ],
-            backgroundColor: ['#ea580c', '#2563eb', '#059669']
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom' }
-          }
-        }
-      });
-    }
-
-    async function loadData() {
-      const statusText = document.getElementById('statusText');
-      const tahunSelected = document.getElementById('tahunFilter').value;
-      const bulanSelected = document.getElementById('bulanFilter').value;
-
-      try {
-        let res = await fetch(GVIZ_URL);
-        let text = await res.text();
-        
-        let jsonString = text.substring(47, text.length - 2);
-        let rawData = JSON.parse(jsonString);
-        let rows = rawData.table.rows;
-
-        let totalMasuk = 0;
-        let totalKeluar = 0;
-        let saldoBNI = 0;
-        let saldoBMT = 0;
-        let saldoKasFisik = 0;
-
-        let bulanMasuk = new Array(12).fill(0);
-        let bulanKeluar = new Array(12).fill(0);
-
-        rows.forEach(r => {
-          let c = r.c;
-          if (!c) return;
-
-          let rawDate = c[0] ? (c[0].v || c[0].f || '') : '';
-          let jenis = String(c[1] ? (c[1].v || '') : '').toLowerCase().trim();
-          let jumlah = Number(c[2] ? (c[2].v || 0) : 0);
-          let rekening = String(c[4] ? (c[4].v || '') : '').toLowerCase().trim();
-
-          let tglStr = String(rawDate);
-          
-          // Ambil Indeks Bulan (0-11)
-          let bulanIndex = -1;
-          if (typeof rawDate === 'string' && rawDate.includes('Date(')) {
-            let parts = rawDate.match(/\d+/g);
-            if (parts && parts.length >= 2) bulanIndex = parseInt(parts[1]);
-          } else if (typeof rawDate === 'string' && rawDate.includes('-')) {
-            let parts = rawDate.split('-');
-            if (parts.length >= 2) bulanIndex = parseInt(parts[1]) - 1;
-          }
-
-          let cocokTahun = (tahunSelected === 'ALL') || tglStr.includes(tahunSelected);
-          let cocokBulan = (bulanSelected === 'ALL') || (bulanIndex === parseInt(bulanSelected));
-
-          // Rekap untuk Grafik Tahunan penuh (tidak terpengaruh filter bulan agar grafik bulanan tetap utuh 1 tahun)
-          if (cocokTahun) {
-            if (jenis === 'masuk' && bulanIndex >= 0 && bulanIndex < 12) bulanMasuk[bulanIndex] += jumlah;
-            if (jenis === 'keluar' && bulanIndex >= 0 && bulanIndex < 12) bulanKeluar[bulanIndex] += jumlah;
-          }
-
-          // Akumulasi nominal kartu ringkasan & rincian berdasarkan filter tahun DAN bulan
-          if (cocokTahun && cocokBulan) {
-            if (jenis === 'masuk') {
-              totalMasuk += jumlah;
-              if (rekening.includes('bni')) saldoBNI += jumlah;
-              else if (rekening.includes('bmt')) saldoBMT += jumlah;
-              else if (rekening.includes('kas') || rekening.includes('fisik') || rekening.includes('tunai')) saldoKasFisik += jumlah;
-
-            } else if (jenis === 'keluar') {
-              totalKeluar += jumlah;
-              if (rekening.includes('bni')) saldoBNI -= jumlah;
-              else if (rekening.includes('bmt')) saldoBMT -= jumlah;
-              else if (rekening.includes('kas') || rekening.includes('fisik') || rekening.includes('tunai')) saldoKasFisik -= jumlah;
-            }
-          }
-        });
-
-        let saldoBersih = totalMasuk - totalKeluar;
-
-        document.getElementById('arusMasuk').innerText = formatRupiah(totalMasuk);
-        document.getElementById('arusKeluar').innerText = formatRupiah(totalKeluar);
-        document.getElementById('saldoBersih').innerText = formatRupiah(saldoBersih);
-
-        document.getElementById('saldoBNI').innerText = formatRupiah(saldoBNI);
-        document.getElementById('saldoBMT').innerText = formatRupiah(saldoBMT);
-        document.getElementById('saldoKasFisik').innerText = formatRupiah(saldoKasFisik);
-        document.getElementById('totalGabungan').innerText = formatRupiah(saldoBNI + saldoBMT + saldoKasFisik);
-
-        // Render Grafik
-        renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT, saldoKasFisik);
-
-        let namaBulanTeks = bulanSelected === 'ALL' ? 'Semua Bulan' : document.getElementById('bulanFilter').options[document.getElementById('bulanFilter').selectedIndex].text;
-        statusText.innerText = `Data dimuat (${namaBulanTeks} ${tahunSelected === 'ALL' ? 'Semua Tahun' : 'Tahun ' + tahunSelected})`;
-
-      } catch(error) {
-        console.error('ERROR DATA:', error);
-        statusText.innerText = 'Gagal mengambil data langsung dari Google Sheets.';
-      }
-    }
-
-    loadData();
-  </script>
+<div class="max-w-md mx-auto relative">
+​<!-- 1. BAR ATAS (HEADER PUTIH & PORTAL LOGIN) -->
+<div class="flex justify-between items-center bg-white p-3.5 rounded-2xl shadow-sm mb-4 border border-gray-100">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-emerald-700 text-white font-bold rounded-full flex items-center justify-center text-xs shadow-inner">
+NU
+</div>
+<div>
+<h1 class="text-base font-bold text-emerald-900 leading-tight">MWCNU Pragaan</h1>
+<p class="text-[11px] text-gray-500 font-medium">Sistem Accounting Kas</p>
+</div>
+</div>
+​<button onclick="toggleModal(true)" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+🔐 <span id="btnLoginText">Portal Login</span>
+</button>
+</div>
+​<!-- 2. GAMBAR ULAMA -->
+<div class="mb-4 overflow-hidden rounded-2xl shadow-md border border-gray-100">
+<img src="pengurusmwcnu.png.jpg" alt="Pengurus MWCNU Pragaan" class="w-full h-auto block">
+</div>
+​<!-- 3. BANNER HERO HIJAU -->
+<div class="bg-emerald-900 text-white rounded-2xl p-6 text-center shadow-md mb-6">
+<div class="flex justify-center mb-3">
+<div class="w-10 h-10 bg-emerald-800/80 rounded-full flex items-center justify-center border border-emerald-700/50">
+🌿
+</div>
+</div>
+​<h2 class="text-xl font-extrabold tracking-wide mb-2 uppercase text-white">
+MWCNU PRAGAAN
+</h2>
+​<div class="space-y-1 text-xs text-emerald-100/90 font-normal leading-relaxed max-w-sm mx-auto">
+<p>Sistem Informasi Pelaporan Keuangan Terpadu</p>
+<p class="font-medium">MWCNU Pragaan Masa Khidmat 2024-2029</p>
+<p class="text-[11px] text-emerald-200/80 pt-1">
+Mewujudkan Tata Kelola Kas Jam'iyah yang Transparan dan Akuntabel
+</p>
+</div>
+</div>
+​<!-- Filter Tahun & Bulan -->
+<div class="bg-white rounded-2xl p-4 mb-4 shadow-sm space-y-3">
+<div class="flex items-center justify-center gap-2 text-green-800 font-semibold">📅 Filter Periode Buku</div>
+​<div class="grid grid-cols-2 gap-2">
+<!-- Filter Tahun -->
+<div>
+<label class="text-[10px] text-gray-500 font-medium block mb-1">Tahun:</label>
+<select id="tahunFilter" onchange="loadData()" class="w-full border rounded-lg p-2.5 text-center font-medium bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none text-xs">
+<option value="ALL">-- Semua --</option>
+<option value="2026" selected>2026</option>
+<option value="2025">2025</option>
+<option value="2024">2024</option>
+</select>
+</div>
+​<!-- Filter Bulan -->
+<div>
+<label class="text-[10px] text-gray-500 font-medium block mb-1">Bulan:</label>
+<select id="bulanFilter" onchange="loadData()" class="w-full border rounded-lg p-2.5 text-center font-medium bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none text-xs">
+<option value="ALL" selected>-- Semua Bulan --</option>
+<option value="0">Januari</option>
+<option value="1">Februari</option>
+<option value="2">Maret</option>
+<option value="3">April</option>
+<option value="4">Mei</option>
+<option value="5">Juni</option>
+<option value="6">Juli</option>
+<option value="7">Agustus</option>
+<option value="8">September</option>
+<option value="9">Oktober</option>
+<option value="10">November</option>
+<option value="11">Desember</option>
+</select>
+</div>
+</div>
+</div>
+​<!-- Ringkasan Total (Arus Masuk/Keluar berdasarkan Filter Bulan) -->
+<div class="space-y-3 mb-4">
+<div class="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl p-5 shadow">
+<p class="text-sm opacity-90">Total Arus Masuk</p>
+<p class="text-3xl font-bold" id="arusMasuk">Rp 0</p>
+</div>
+<div class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl p-5 shadow">
+<p class="text-sm opacity-90">Total Arus Keluar</p>
+<p class="text-3xl font-bold" id="arusKeluar">Rp 0</p>
+</div>
+<div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-2xl p-5 shadow">
+<p class="text-sm opacity-90">Saldo Bersih (Bulan Ini)</p>
+<p class="text-3xl font-bold" id="saldoBersih">Rp 0</p>
+</div>
+</div>
+​<!-- Rincian Kas (Saldo Kumulatif Berjalan) -->
+<div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+<h2 class="text-green-800 font-bold mb-3">💳 Rincian Saldo Kas (Kumulatif Riil)</h2>
+<div class="space-y-3">
+<!-- BNI -->
+<div class="border border-orange-200 rounded-xl p-4 bg-orange-50">
+<div class="flex justify-between items-center mb-1">
+<p class="font-semibold text-orange-800">Bank BNI</p>
+<span class="text-xs bg-orange-600 text-white px-2 py-1 rounded">Rek 1</span>
+</div>
+<p class="text-xs text-gray-500 mb-2">No. Rek: 1921854722</p>
+<p class="text-2xl font-bold text-orange-700" id="saldoBNI">Rp 0</p>
+</div>
+​<!-- BMT NUansaumat -->
+<div class="border border-blue-200 rounded-xl p-4 bg-blue-50">
+<div class="flex justify-between items-center mb-1">
+<p class="font-semibold text-blue-800">BMT NUansaumat</p>
+<span class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Rek 2</span>
+</div>
+<p class="text-xs text-gray-500 mb-2">No. Rek: 01-120101000309</p>
+<p class="text-2xl font-bold text-blue-700" id="saldoBMT">Rp 0</p>
+</div>
+​<!-- Kas Fisik / Tunai -->
+<div class="border border-emerald-200 rounded-xl p-4 bg-emerald-50">
+<div class="flex justify-between items-center mb-1">
+<p class="font-semibold text-emerald-800">Kas Fisik / Tunai</p>
+<span class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Tunai</span>
+</div>
+<p class="text-xs text-gray-500 mb-2">Penyimpanan: Pegangan Bendahara</p>
+<p class="text-2xl font-bold text-emerald-700" id="saldoKasFisik">Rp 0</p>
+</div>
+​<!-- Total Gabungan -->
+<div class="border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
+<p class="text-center text-sm text-gray-600">Total Kas Keseluruhan</p>
+<p class="text-center text-2xl font-bold text-gray-800" id="totalGabungan">Rp 0</p>
+</div>
+</div>
+</div>
+​<!-- BAGIAN GRAFIK -->
+<div class="bg-white rounded-2xl p-4 shadow-sm mb-4 space-y-6">
+<div>
+<h2 class="text-green-800 font-bold mb-3">📈 Grafik Arus Kas Bulanan</h2>
+<div class="relative h-64">
+<canvas id="chartBulanan"></canvas>
+</div>
+</div>
+​<hr class="border-gray-100">
+​<div>
+<h2 class="text-green-800 font-bold mb-3">🍰 Distribusi Saldo Kas Riil</h2>
+<div class="relative h-56 flex justify-center">
+<canvas id="chartRekening"></canvas>
+</div>
+</div>
+</div>
+​<!-- Status Text -->
+<div class="bg-white rounded-2xl p-4 shadow-sm">
+<h2 class="text-green-800 font-bold mb-3">📊 Status Data</h2>
+<p class="text-center text-gray-500 text-sm py-2" id="statusText">Memuat data...</p>
+</div>
+​</div>
+​<!-- POPUP MODAL LOGIN -->
+<div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+<div class="bg-white rounded-2xl p-6 w-full max-w-xs shadow-xl text-center">
+<h3 class="text-lg font-bold text-green-800 mb-2">🔒 Login Bendahara</h3>
+<p class="text-xs text-gray-500 mb-4">Masukkan PIN Akses Pengurus</p>
+​<input type="password" id="pinInput" placeholder="Masukkan PIN" class="w-full border rounded-lg p-3 text-center mb-4 text-lg tracking-widest outline-none focus:ring-2 focus:ring-green-600">
+​<div class="flex gap-2">
+<button onclick="toggleModal(false)" class="w-1/2 bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-300">Batal</button>
+<button onclick="prosesLogin()" class="w-1/2 bg-green-700 text-white py-2 rounded-lg font-semibold hover:bg-green-800">Masuk</button>
+</div>
+</div>
+</div>
+​<script>
+const SPREADSHEET_ID = '1L8CAKR5cT7QPFi5s1a_XJMR8jk_2Wh2Jb1HJahcenoI';
+const GVIZ_URL = [https://docs.google.com/spreadsheets/d/$](https://docs.google.com/spreadsheets/d/$){SPREADSHEET_ID}/gviz/tq?tqx=out:json;
+​const PIN_BENDAHARA = '999';
+const LINK_SPREADSHEET = [https://docs.google.com/spreadsheets/d/$](https://docs.google.com/spreadsheets/d/$){SPREADSHEET_ID}/edit?gid=0#gid=0;
+​const formatRupiah = (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
+​let chartBulananInstance = null;
+let chartRekeningInstance = null;
+​function toggleModal(show) {
+const modal = document.getElementById('loginModal');
+modal.classList.toggle('hidden', !show);
+if(show) document.getElementById('pinInput').focus();
+}
+​function prosesLogin() {
+const pin = document.getElementById('pinInput').value;
+if (pin === PIN_BENDAHARA) {
+alert('Login Berhasil! Mengarahkan ke Google Sheets...');
+window.open(LINK_SPREADSHEET, '_blank');
+document.getElementById('btnLoginText').innerText = 'Pengurus';
+toggleModal(false);
+document.getElementById('pinInput').value = '';
+} else {
+alert('PIN Salah! Silakan coba lagi.');
+}
+}
+​function renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT, saldoKasFisik) {
+const namaBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+​// Grafik Bulanan (Bar Chart)
+const ctxBulanan = document.getElementById('chartBulanan').getContext('2d');
+if (chartBulananInstance) chartBulananInstance.destroy();
+​chartBulananInstance = new Chart(ctxBulanan, {
+type: 'bar',
+data: {
+labels: namaBulan,
+datasets: [
+{ label: 'Masuk', data: bulanMasuk, backgroundColor: '#16a34a', borderRadius: 4 },
+{ label: 'Keluar', data: bulanKeluar, backgroundColor: '#dc2626', borderRadius: 4 }
+]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+plugins: { legend: { position: 'bottom' } },
+scales: {
+y: {
+beginAtZero: true,
+ticks: { callback: (val) => 'Rp ' + (val / 1000000).toFixed(0) + 'Jt' }
+}
+}
+}
+});
+​// Grafik Rekening (Doughnut Chart)
+const ctxRekening = document.getElementById('chartRekening').getContext('2d');
+if (chartRekeningInstance) chartRekeningInstance.destroy();
+​chartRekeningInstance = new Chart(ctxRekening, {
+type: 'doughnut',
+data: {
+labels: ['Bank BNI', 'BMT NUansaumat', 'Kas Fisik'],
+datasets: [{
+data: [
+saldoBNI > 0 ? saldoBNI : 0,
+saldoBMT > 0 ? saldoBMT : 0,
+saldoKasFisik > 0 ? saldoKasFisik : 0
+],
+backgroundColor: ['#ea580c', '#2563eb', '#059669']
+}]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+plugins: { legend: { position: 'bottom' } }
+}
+});
+}
+​async function loadData() {
+const statusText = document.getElementById('statusText');
+const tahunSelected = document.getElementById('tahunFilter').value;
+const bulanSelected = document.getElementById('bulanFilter').value;
+​try {
+let res = await fetch(GVIZ_URL);
+let text = await res.text();
+​let jsonString = text.substring(47, text.length - 2);
+let rawData = JSON.parse(jsonString);
+let rows = rawData.table.rows;
+​let totalMasukBulan = 0;
+let totalKeluarBulan = 0;
+​let saldoBNI = 0;
+let saldoBMT = 0;
+let saldoKasFisik = 0;
+​let bulanMasuk = new Array(12).fill(0);
+let bulanKeluar = new Array(12).fill(0);
+​let targetTahun = tahunSelected === 'ALL' ? 9999 : parseInt(tahunSelected);
+let targetBulan = bulanSelected === 'ALL' ? 11 : parseInt(bulanSelected);
+​rows.forEach(r => {
+let c = r.c;
+if (!c) return;
+​let rawDate = c[0] ? (c[0].v || c[0].f || '') : '';
+let jenis = String(c[1] ? (c[1].v || '') : '').toLowerCase().trim();
+let jumlah = Number(c[2] ? (c[2].v || 0) : 0);
+let rekening = String(c[4] ? (c[4].v || '') : '').toLowerCase().trim();
+​let tglStr = String(rawDate);
+​let bulanIndex = -1;
+let tahunRow = 0;
+​if (typeof rawDate === 'string' && rawDate.includes('Date(')) {
+let parts = rawDate.match(/\d+/g);
+if (parts && parts.length >= 2) {
+tahunRow = parseInt(parts[0]);
+bulanIndex = parseInt(parts[1]);
+}
+} else if (typeof rawDate === 'string' && rawDate.includes('-')) {
+let parts = rawDate.split('-');
+if (parts.length >= 2) {
+tahunRow = parseInt(parts[0]);
+bulanIndex = parseInt(parts[1]) - 1;
+}
+}
+​let cocokTahun = (tahunSelected === 'ALL') || (tahunRow === targetTahun) || tglStr.includes(tahunSelected);
+let cocokBulan = (bulanSelected === 'ALL') || (bulanIndex === parseInt(bulanSelected));
+​// 1. Grafik Tahunan Penuh
+if (cocokTahun) {
+if (jenis === 'masuk' && bulanIndex >= 0 && bulanIndex < 12) bulanMasuk[bulanIndex] += jumlah;
+if (jenis === 'keluar' && bulanIndex >= 0 && bulanIndex < 12) bulanKeluar[bulanIndex] += jumlah;
+}
+​// 2. Arus Masuk & Keluar Berdasarkan Filter Bulan
+if (cocokTahun && cocokBulan) {
+if (jenis === 'masuk') totalMasukBulan += jumlah;
+else if (jenis === 'keluar') totalKeluarBulan += jumlah;
+}
+​// 3. Rincian Saldo Kas (KUMULATIF BERJALAN SAMPAI BULAN/TAHUN PILIHAN)
+let sebelumAtauSampaiPeriode = false;
+if (tahunSelected === 'ALL') {
+sebelumAtauSampaiPeriode = true;
+} else if (tahunRow < targetTahun) {
+sebelumAtauSampaiPeriode = true;
+} else if (tahunRow === targetTahun) {
+if (bulanSelected === 'ALL' || bulanIndex <= targetBulan) {
+sebelumAtauSampaiPeriode = true;
+}
+}
+​if (sebelumAtauSampaiPeriode) {
+if (jenis === 'masuk') {
+if (rekening.includes('bni')) saldoBNI += jumlah;
+else if (rekening.includes('bmt')) saldoBMT += jumlah;
+else if (rekening.includes('kas') || rekening.includes('fisik') || rekening.includes('tunai')) saldoKasFisik += jumlah;
+} else if (jenis === 'keluar') {
+if (rekening.includes('bni')) saldoBNI -= jumlah;
+else if (rekening.includes('bmt')) saldoBMT -= jumlah;
+else if (rekening.includes('kas') || rekening.includes('fisik') || rekening.includes('tunai')) saldoKasFisik -= jumlah;
+}
+}
+});
+​let saldoBersihBulan = totalMasukBulan - totalKeluarBulan;
+​document.getElementById('arusMasuk').innerText = formatRupiah(totalMasukBulan);
+document.getElementById('arusKeluar').innerText = formatRupiah(totalKeluarBulan);
+document.getElementById('saldoBersih').innerText = formatRupiah(saldoBersihBulan);
+​document.getElementById('saldoBNI').innerText = formatRupiah(saldoBNI);
+document.getElementById('saldoBMT').innerText = formatRupiah(saldoBMT);
+document.getElementById('saldoKasFisik').innerText = formatRupiah(saldoKasFisik);
+document.getElementById('totalGabungan').innerText = formatRupiah(saldoBNI + saldoBMT + saldoKasFisik);
+​renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT, saldoKasFisik);
+​let namaBulanTeks = bulanSelected === 'ALL' ? 'Semua Bulan' : document.getElementById('bulanFilter').options[document.getElementById('bulanFilter').selectedIndex].text;
+statusText.innerText = Data dimuat (${namaBulanTeks} ${tahunSelected === 'ALL' ? 'Semua Tahun' : 'Tahun ' + tahunSelected});
+​} catch(error) {
+console.error('ERROR DATA:', error);
+statusText.innerText = 'Gagal mengambil data langsung dari Google Sheets.';
+}
+}
+​loadData();
+</script>
 </body>
 </html>
