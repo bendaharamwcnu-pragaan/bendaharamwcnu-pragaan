@@ -56,15 +56,42 @@
       </div>
     </div>
 
-    <!-- Filter Tahun -->
-    <div class="bg-white rounded-2xl p-4 mb-4 shadow-sm">
-      <div class="flex items-center justify-center gap-2 text-green-800 font-semibold mb-3">📅 Filter Tahun Buku</div>
-      <select id="tahunFilter" onchange="loadData()" class="w-full border rounded-lg p-3 text-center font-medium bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none">
-        <option value="ALL">-- Semua Tahun --</option>
-        <option value="2026" selected>2026</option>
-        <option value="2025">2025</option>
-        <option value="2024">2024</option>
-      </select>
+    <!-- Filter Tahun & Bulan (BARU) -->
+    <div class="bg-white rounded-2xl p-4 mb-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-center gap-2 text-green-800 font-semibold">📅 Filter Periode Buku</div>
+      
+      <div class="grid grid-cols-2 gap-2">
+        <!-- Filter Tahun -->
+        <div>
+          <label class="text-[10px] text-gray-500 font-medium block mb-1">Tahun:</label>
+          <select id="tahunFilter" onchange="loadData()" class="w-full border rounded-lg p-2.5 text-center font-medium bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none text-xs">
+            <option value="ALL">-- Semua --</option>
+            <option value="2026" selected>2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+
+        <!-- Filter Bulan -->
+        <div>
+          <label class="text-[10px] text-gray-500 font-medium block mb-1">Bulan:</label>
+          <select id="bulanFilter" onchange="loadData()" class="w-full border rounded-lg p-2.5 text-center font-medium bg-gray-50 focus:ring-2 focus:ring-green-600 outline-none text-xs">
+            <option value="ALL" selected>-- Semua Bulan --</option>
+            <option value="0">Januari</option>
+            <option value="1">Februari</option>
+            <option value="2">Maret</option>
+            <option value="3">April</option>
+            <option value="4">Mei</option>
+            <option value="5">Juni</option>
+            <option value="6">Juli</option>
+            <option value="7">Agustus</option>
+            <option value="8">September</option>
+            <option value="9">Oktober</option>
+            <option value="10">November</option>
+            <option value="11">Desember</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <!-- Ringkasan Total -->
@@ -107,7 +134,7 @@
           <p class="text-2xl font-bold text-blue-700" id="saldoBMT">Rp 0</p>
         </div>
 
-        <!-- Kas Fisik / Tunai (BARU) -->
+        <!-- Kas Fisik / Tunai -->
         <div class="border border-emerald-200 rounded-xl p-4 bg-emerald-50">
           <div class="flex justify-between items-center mb-1">
             <p class="font-semibold text-emerald-800">Kas Fisik / Tunai</p>
@@ -273,6 +300,7 @@
     async function loadData() {
       const statusText = document.getElementById('statusText');
       const tahunSelected = document.getElementById('tahunFilter').value;
+      const bulanSelected = document.getElementById('bulanFilter').value;
 
       try {
         let res = await fetch(GVIZ_URL);
@@ -301,8 +329,7 @@
           let rekening = String(c[4] ? (c[4].v || '') : '').toLowerCase().trim();
 
           let tglStr = String(rawDate);
-          let cocokTahun = (tahunSelected === 'ALL') || tglStr.includes(tahunSelected);
-
+          
           // Ambil Indeks Bulan (0-11)
           let bulanIndex = -1;
           if (typeof rawDate === 'string' && rawDate.includes('Date(')) {
@@ -313,22 +340,28 @@
             if (parts.length >= 2) bulanIndex = parseInt(parts[1]) - 1;
           }
 
+          let cocokTahun = (tahunSelected === 'ALL') || tglStr.includes(tahunSelected);
+          let cocokBulan = (bulanSelected === 'ALL') || (bulanIndex === parseInt(bulanSelected));
+
+          // Rekap untuk Grafik Tahunan penuh (tidak terpengaruh filter bulan agar grafik bulanan tetap utuh 1 tahun)
           if (cocokTahun) {
+            if (jenis === 'masuk' && bulanIndex >= 0 && bulanIndex < 12) bulanMasuk[bulanIndex] += jumlah;
+            if (jenis === 'keluar' && bulanIndex >= 0 && bulanIndex < 12) bulanKeluar[bulanIndex] += jumlah;
+          }
+
+          // Akumulasi nominal kartu ringkasan & rincian berdasarkan filter tahun DAN bulan
+          if (cocokTahun && cocokBulan) {
             if (jenis === 'masuk') {
               totalMasuk += jumlah;
               if (rekening.includes('bni')) saldoBNI += jumlah;
               else if (rekening.includes('bmt')) saldoBMT += jumlah;
               else if (rekening.includes('kas') || rekening.includes('fisik') || rekening.includes('tunai')) saldoKasFisik += jumlah;
 
-              if (bulanIndex >= 0 && bulanIndex < 12) bulanMasuk[bulanIndex] += jumlah;
-
             } else if (jenis === 'keluar') {
               totalKeluar += jumlah;
               if (rekening.includes('bni')) saldoBNI -= jumlah;
               else if (rekening.includes('bmt')) saldoBMT -= jumlah;
               else if (rekening.includes('kas') || rekening.includes('fisik') || rekening.includes('tunai')) saldoKasFisik -= jumlah;
-
-              if (bulanIndex >= 0 && bulanIndex < 12) bulanKeluar[bulanIndex] += jumlah;
             }
           }
         });
@@ -347,7 +380,8 @@
         // Render Grafik
         renderCharts(bulanMasuk, bulanKeluar, saldoBNI, saldoBMT, saldoKasFisik);
 
-        statusText.innerText = 'Data berhasil dimuat (' + (tahunSelected === 'ALL' ? 'Semua Tahun' : 'Tahun ' + tahunSelected) + ')';
+        let namaBulanTeks = bulanSelected === 'ALL' ? 'Semua Bulan' : document.getElementById('bulanFilter').options[document.getElementById('bulanFilter').selectedIndex].text;
+        statusText.innerText = `Data dimuat (${namaBulanTeks} ${tahunSelected === 'ALL' ? 'Semua Tahun' : 'Tahun ' + tahunSelected})`;
 
       } catch(error) {
         console.error('ERROR DATA:', error);
